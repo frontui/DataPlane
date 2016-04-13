@@ -19,6 +19,10 @@
 
 {# 加载页面内容 #}
 {% block content %}
+
+    {# 渲染主导航 #}
+    {{ navigator.theNav(mainNav,cur='1') }}
+
 {% endblock %}
 
 

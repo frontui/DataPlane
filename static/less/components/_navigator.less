@@ -1,0 +1,35 @@
+//主导航
+@height-nav: 60px;
+@bgColor1-nav: #383d41;
+@bgColor2-nav: #252c32;
+@bgColor1-btn-nav: #3c4349;
+@bgColor2-btn-nav: #565e61;
+
+.nav-wrap {
+  display: block;
+  background: linear-gradient(to bottom,@bgColor1-nav, @bgColor2-nav);
+  padding-left: 40px;
+}
+
+.nav {
+  .reset-list( left,@fontSize-large,@height-nav );
+  .clearfix();
+
+  > li {
+
+    > a {
+       .link-custom( #fff,#fff,none );
+        display: block;
+        text-align: center;
+        height: @height-nav;
+        padding: 0 40px;
+    }
+
+    &.current {
+
+      > a {
+        background: linear-gradient(to bottom,@bgColor1-btn-nav, @bgColor2-btn-nav);
+      }
+    }
+  }
+}
