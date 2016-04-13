@@ -20,5 +20,6 @@
 {# 引用公共 javascript 文件 #}
 {% block globalJs %}
 <script src="{{ bower_components }}/jquery/dist/jquery.min.js?v={{ version }}"></script>
+<script src="{{ static }}/js/echarts.js?v={{ version }}"></script>
 <script src="{{ static }}/js/common.js?v={{ version }}"></script>
 {% endblock %}
