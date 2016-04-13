@@ -1,0 +1,174 @@
+﻿@charset "utf-8";
+
+//排版工具类，尽量能在元素样式里面申明就不要用到这种附加类，否则会增加兼容性样式编写的难度，此类工具多用在对版面布局没影响的元素中
+.text-align-right {
+    text-align: right !important;
+}
+
+.text-align-left {
+    text-align: left !important;
+}
+
+.text-align-center {
+    text-align: center !important;
+}
+
+.text-align-justify {
+    text-align: justify !important;
+}
+
+.float-left {
+    float: left !important;
+}
+
+.float-right {
+    float: right !important;
+}
+
+.text-hide {
+    .text-hide();
+}
+
+.word-wrap {
+    .word-wrap();
+}
+
+.text-nowrap {
+    white-space: nowrap;
+}
+
+.inline-block {
+    .inline-block();
+}
+
+//
+// 递归生成 margin 族类
+//
+.init-margin(@min: 0, @max: 50, @space: 5, @pre: fn) {
+  .build-margin(@count) when (@count >= @min) {
+    .build-margin((@count - @space));
+
+    .@{pre}-mt-@{count} {
+      margin-top: @count * 1px;
+    }
+    .@{pre}-mb-@{count} {
+      margin-bottom: @count * 1px;
+    }
+    .@{pre}-mtb-@{count} {
+      margin-top: @count * 1px;
+      margin-bottom: @count * 1px;
+    }
+
+    .@{pre}-ml-@{count} {
+      margin-left: @count * 1px;
+    }
+    .@{pre}-mr-@{count} {
+      margin-right: @count * 1px;
+    }
+    .@{pre}-mlr-@{count} {
+      margin-left: @count * 1px;
+      margin-right: @count * 1px;
+    }
+
+    .@{pre}-ma-@{count} {
+      margin: @count * 1px;
+    }
+  }
+
+  .build-margin(@max);
+}
+
+.init-margin;
+
+//
+// 递归生成 padding 族类
+//
+.init-padding(@min: 0, @max: 50, @space: 5, @pre: fn) {
+  .build-padding(@count) when (@count >= @min) {
+    .build-padding((@count - @space));
+
+    .@{pre}-pt-@{count} {
+      padding-top: @count * 1px;
+    }
+    .@{pre}-pb-@{count} {
+      padding-bottom: @count * 1px;
+    }
+    .@{pre}-ptb-@{count} {
+      padding-top: @count * 1px;
+      padding-bottom: @count * 1px;
+    }
+
+    .@{pre}-pl-@{count} {
+      padding-left: @count * 1px;
+    }
+    .@{pre}-pr-@{count} {
+      padding-right: @count * 1px;
+    }
+    .@{pre}-plr-@{count} {
+      padding-left: @count * 1px;
+      padding-right: @count * 1px;
+    }
+
+    .@{pre}-pa-@{count} {
+      padding: @count * 1px;
+    }
+  }
+
+  .build-padding(@max);
+}
+
+.init-padding;
+
+//
+// 递归生成 fontSize 族类
+//
+.init-fontSize(@min: 12, @max: 36, @space: 2, @pre: fs) {
+  .build-fontSize(@count) when (@count >= @min) {
+    .build-fontSize((@count - @space));
+
+    .@{pre}-@{count} {
+      font-size: @count * 1px;
+    }
+    .lh-@{count} {
+      line-height: @count * 1px;
+    }
+  }
+
+  .build-fontSize(@max);
+}
+
+.init-fontSize;
+
+//箭头
+.caret,
+.caret-down {
+    .arrow-up-or-down(border-top,@sizeY-default-caret,@sizeX-default-caret);
+}
+
+.caret-up {
+    .arrow-up-or-down(border-bottom,@sizeY-default-caret,@sizeX-default-caret);
+}
+
+.caret-left {
+    .arrow-left-or-right(border-right,@sizeX-default-caret,@sizeY-default-caret);
+}
+
+.caret-right {
+    .arrow-left-or-right(border-left,@sizeX-default-caret,@sizeY-default-caret);
+}
+
+//清除浮动
+.clearfix {
+    *zoom:1;
+}
+
+.clearfix:before,
+.clearfix:after {
+    display:table;
+    line-height:0;
+    content:"";
+}
+
+.clearfix:after {
+    clear:both;
+}

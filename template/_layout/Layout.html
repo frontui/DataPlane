@@ -1,0 +1,24 @@
+{% extends "_layout/Base.html" %}
+
+
+{# 引用公共样式表 #}
+{% block globalCss %}
+	<link rel="stylesheet" href="{{ static }}/css/main.css?v={{ version }}">
+{% endblock %}
+
+
+{# 公共Dom树 #}
+{% block body %}
+
+    {# 加载页面内容 #}
+    {% block content %}
+    {% endblock %}
+
+{% endblock %}
+
+
+{# 引用公共 javascript 文件 #}
+{% block globalJs %}
+<script src="{{ bower_components }}/jquery/dist/jquery.min.js?v={{ version }}"></script>
+<script src="{{ static }}/js/common.js?v={{ version }}"></script>
+{% endblock %}
