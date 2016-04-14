@@ -47,9 +47,6 @@
 @fontColor-base: #999;
     //标题色调
     @fontColor-heading: #333;
-
-    @fontColor-text:#666;
-
     //默认文本色调
     @fontColor-default: #666;
     //副文本色调
@@ -167,3 +164,14 @@
 @container-large-desktop:      (1140px + @grid-gutter-width);
 // For `@screen-lg-min` and up.
 @container-lg:                 @container-large-desktop;
+
+//数据展板主导航
+@height-nav: 60px;
+@bgColor1-nav: #383d41;
+@bgColor2-nav: #252c32;
+@bgColor1-btn-nav: #3c4349;
+@bgColor2-btn-nav: #565e61;
+    //数据展板主导航（响应式参数）（max-height:768px）
+    @height-maxHeight768-nav: @height-nav - 20px;
+
+//数据展板内容框架

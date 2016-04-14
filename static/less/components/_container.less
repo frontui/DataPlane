@@ -1,0 +1,43 @@
+//内容容器
+.main-container {
+  position: fixed;
+  top: @height-nav;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  .clearfix();
+  display: flex;
+  flex-direction: row;
+  .transition(all,0.3s,ease,0);
+
+  &-part1 {
+    flex-grow: 4;
+    background-color: @domColor3;
+
+    //为子类 &-left 和 &-right 作 flex布局父类
+    flex-direction: column;
+    display: flex;
+
+    &-top {
+      flex-grow: 5;
+      background-color: @domColor7;
+    }
+
+    &-bottom {
+      flex-grow: 1;
+      background-color: @domColor6;
+    }
+  }
+
+  &-part2 {
+    flex-grow: 1;
+    background-color: @domColor2;
+  }
+}
+
+@media (max-height:768px) {
+  .main-container {
+    top: @height-maxHeight768-nav;
+  }
+}
+

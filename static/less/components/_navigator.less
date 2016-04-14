@@ -1,14 +1,9 @@
 //主导航
-@height-nav: 60px;
-@bgColor1-nav: #383d41;
-@bgColor2-nav: #252c32;
-@bgColor1-btn-nav: #3c4349;
-@bgColor2-btn-nav: #565e61;
-
 .nav-wrap {
   display: block;
   background: linear-gradient(to bottom,@bgColor1-nav, @bgColor2-nav);
   padding-left: 40px;
+  .transition(all,0.3s,ease,0);
 }
 
 .nav {
@@ -18,17 +13,36 @@
   > li {
 
     > a {
-       .link-custom( #fff,#fff,none );
-        display: block;
-        text-align: center;
-        height: @height-nav;
-        padding: 0 40px;
+      .link-custom( #fff,#fff,none );
+      display: block;
+      text-align: center;
+      height: @height-nav;
+      padding: 0 40px;
+      .transition(all,0.3s,ease,0);
     }
 
     &.current {
 
       > a {
         background: linear-gradient(to bottom,@bgColor1-btn-nav, @bgColor2-btn-nav);
+      }
+    }
+  }
+}
+
+@media (max-height:768px) {
+  .nav-wrap {
+    padding-left: 25px;
+  }
+
+  .nav {
+    .reset-list( left,@fontSize-small,@height-maxHeight768-nav );
+
+    > li {
+
+      > a {
+        height: @height-maxHeight768-nav;
+        padding: 0 25px;
       }
     }
   }
