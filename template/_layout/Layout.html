@@ -34,6 +34,8 @@
 {# 引用公共 javascript 文件 #}
 {% block globalJs %}
 <script src="{{ bower_components }}/jquery/dist/jquery.min.js?v={{ version }}"></script>
-<script src="{{ static }}/js/echarts.js?v={{ version }}"></script>
+<script src="{{ static }}/js/echarts.js?v={{ version }}"></script><!--install echarts-->
+<script src="{{ static }}/js/vintage.js?v={{ version }}"></script><!--install echarts theme-->
+<script src="{{ static }}/js/china.js?v={{ version }}"></script><!--install echarts map of china-->
 <script src="{{ static }}/js/common.js?v={{ version }}"></script>
 {% endblock %}

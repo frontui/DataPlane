@@ -12,15 +12,15 @@
 
   &-part1 {
     flex-grow: 4;
-    background-color: @domColor3;
 
-    //为子类 &-left 和 &-right 作 flex布局父类
+    //为子类 &-left 和 &-right 作为 flex 布局父类
     flex-direction: column;
     display: flex;
 
     &-top {
       flex-grow: 5;
-      background-color: @domColor7;
+      position: relative;
+      background-color: #404a59;
     }
 
     &-bottom {
@@ -35,9 +35,35 @@
   }
 }
 
+//图表容器
+.chart-map-container {
+  overflow: hidden;
+  position: absolute;
+  top: 50px;
+  left: 50px;
+  bottom: 50px;
+  right: 50px;
+}
+
 @media (max-height:768px) {
   .main-container {
     top: @height-maxHeight768-nav;
+
+    &-part1 {
+
+      &-bottom {
+        flex-grow: 1.5;
+      }
+    }
+  }
+}
+
+@media (max-width:1024px) {
+  .main-container {
+
+    &-part2 {
+      flex-grow: 1.5;
+    }
   }
 }
 
