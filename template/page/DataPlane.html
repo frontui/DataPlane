@@ -25,8 +25,22 @@
 
     {# 内容 #}
     <div class="main-container">
-        <div class="main-container-part1">
+        <section class="main-container-part1">
             <div class="main-container-part1-top">
+                <div class="main-chart-topic">
+                    <h1>当日交易总额（元）</h1>
+                    <div class="main-chart-topic-values">
+                        <div class="value">7</div>
+                        <div class="point">,</div>
+                        <div class="value">8</div>
+                        <div class="value">0</div>
+                        <div class="value">5</div>
+                        <div class="point">,</div>
+                        <div class="value">0</div>
+                        <div class="value">0</div>
+                        <div class="value">0</div>
+                    </div>
+                </div>
                 <div class="chart-map-container" id="main">
 
                 </div>
@@ -34,10 +48,9 @@
             <div class="main-container-part1-bottom">
 
             </div>
-        </div>
-        <div class="main-container-part2">
-
-        </div>
+        </section>
+        <section class="main-container-part2">
+        </section>
     </div>
 
 {% endblock %}
@@ -316,7 +329,7 @@
     });
 
     var option = {
-        backgroundColor: '#404a59',
+        backgroundColor: 'transparent',
         title : {
             text: '业务数据地图',
             subtext: '数据纯属虚构',
@@ -355,11 +368,11 @@
             roam: true,
             itemStyle: {
                 normal: {
-                    areaColor: '#323c48',
-                    borderColor: '#404a59'
+                    areaColor: '#80a1bb',
+                    borderColor: '#527187'
                 },
                 emphasis: {
-                    areaColor: '#29313b'
+                    areaColor: '#89acc8'
                 }
             }
         },

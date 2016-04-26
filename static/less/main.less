@@ -8,4 +8,75 @@
 @charset "utf-8";
 @import "_share"; //项目共用样式库
 
+//主视图标题
+.main-chart-topic {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  z-index: @zIndex-MainChartTopic;
+
+  > h1 {
+    font-size: @fontSize-Topic-MainChartView;
+    color: @fontColor-Topic-MainChartView;
+    font-weight: 900;
+    padding-bottom: 20px;
+  }
+
+  &-values {
+    font-size: 0;
+    line-height: 0;
+
+    .value {
+      .inline-block();
+      vertical-align: top;
+      width: @width-ValueTopic-MainChartView;
+      height: @height-ValueTopic-MainChartView;
+      text-align: center;
+      font-size: @fontSize-ValueTopic-MainChartView;
+      line-height: @height-ValueTopic-MainChartView - @borderWidth-ValueTopic-MainChartView * 2;
+      color: @fontColor-ValueTopic-MainChartView;
+      background-color: @bgColor-ValueTopic-MainChartView;
+      border: @borderWidth-ValueTopic-MainChartView solid @borderColor-ValueTopic-MainChartView;
+      margin-right: 5px;
+      .outer-shadow(0,0,6px,1);
+      position: relative;
+      overflow: hidden;
+
+      &:after {
+        position: absolute;
+        top: -@borderWidth-ValueTopic-MainChartView;
+        left: -@borderWidth-ValueTopic-MainChartView;
+        width: @width-ValueTopic-MainChartView;
+        height: @height-ValueTopic-MainChartView;
+        content: '';
+        .inner-shadow-full(0,0,5px,2px,80,119,147,1);
+      }
+
+      &:before {
+         position: absolute;
+         top: -@borderWidth-ValueTopic-MainChartView;
+         left: -@borderWidth-ValueTopic-MainChartView - 32px;
+         width: @width-ValueTopic-MainChartView;
+         height: @height-ValueTopic-MainChartView;
+         content: '';
+         background: @bgColor2-ValueTopic-MainChartView;
+         transform: skew(-38deg);
+       }
+    }
+
+    .point {
+      .inline-block();
+      vertical-align: top;
+      width: @width-ValueTopic-MainChartView / 2;
+      height: @height-ValueTopic-MainChartView;
+      text-align: center;
+      font-size: @fontSize-ValueTopic-MainChartView;
+      line-height: @height-ValueTopic-MainChartView;
+      color: @fontColor-ValueTopic-MainChartView;
+      margin-right: 5px;
+    }
+  }
+}
+
+
 

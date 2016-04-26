@@ -165,13 +165,35 @@
 // For `@screen-lg-min` and up.
 @container-lg:                 @container-large-desktop;
 
+//数据展板各组件Z轴排序
+@zIndex-MainChartTopic: 2;
+
 //数据展板主导航
 @height-nav: 60px;
 @bgColor1-nav: #383d41;
 @bgColor2-nav: #252c32;
 @bgColor1-btn-nav: #3c4349;
 @bgColor2-btn-nav: #565e61;
-    //数据展板主导航（响应式参数）（max-height:768px）
-    @height-maxHeight768-nav: @height-nav - 20px;
+  //数据展板主导航（响应式参数）（max-height:768px）
+  @height-maxHeight768-nav: @height-nav - 20px;
 
 //数据展板内容框架
+  //色调
+  @bgColor-Top-Part1-MainContainer: linear-gradient(rgba(32,75,113,1),rgba(171,176,196,1));
+  @bgColor2-Top-Part1-MainContainer: radial-gradient(35% bottom,rgba(209,215,202,1) 10%,transparent,rgba(32,75,113,0.3) 70%);
+  @bgColor-Bottom-Part1-MainContainer: @domColor6;
+  @bgColor-Part2-MainContainer: @domColor3;
+
+//数据展板主视图标题
+  //尺寸
+  @fontSize-Topic-MainChartView: ceil((@fontSize-largest*1.23)); // ~46px
+  @fontSize-ValueTopic-MainChartView: ceil((@fontSize-largest*2.05)); // ~70px
+  @borderWidth-ValueTopic-MainChartView: 1px;
+  @width-ValueTopic-MainChartView: 66px;
+  @height-ValueTopic-MainChartView: 80px;
+  //色调
+  @fontColor-Topic-MainChartView: @domColor7;
+  @fontColor-ValueTopic-MainChartView: @fontColor-Topic-MainChartView;
+  @bgColor-ValueTopic-MainChartView: rgba(0,0,0,0.5);
+  @bgColor2-ValueTopic-MainChartView: linear-gradient(rgba(255,255,255,0.12) 10%,transparent 90%);
+  @borderColor-ValueTopic-MainChartView: #507793;

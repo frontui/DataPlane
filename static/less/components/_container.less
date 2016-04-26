@@ -20,18 +20,27 @@
     &-top {
       flex-grow: 5;
       position: relative;
-      background-color: #404a59;
+      background: @bgColor-Top-Part1-MainContainer;
+      overflow: hidden;
+
+      &:before {
+        position: absolute;
+        background: @bgColor2-Top-Part1-MainContainer;
+        content: '';
+        width: 100%;
+        height: 100%;
+      }
     }
 
     &-bottom {
       flex-grow: 1;
-      background-color: @domColor6;
+      background-color: @bgColor-Bottom-Part1-MainContainer;
     }
   }
 
   &-part2 {
     flex-grow: 1;
-    background-color: @domColor3;
+    background-color: @bgColor-Part2-MainContainer;
   }
 }
 

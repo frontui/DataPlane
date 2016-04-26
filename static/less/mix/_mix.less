@@ -89,6 +89,11 @@
        -moz-box-shadow: inset @x @y @blur rgba(0, 0, 0, @alpha);*/
             box-shadow: inset @x @y @blur rgba(0, 0, 0, @alpha);
 }
+.inner-shadow-full( @x, @y, @blur, @spread, @rgbR, @rgbG, @rgbB, @alpha ) {
+  /*-webkit-box-shadow: inset @x @y @blur @spread rgba(@rgbR, @rgbG, @rgbB, @alpha);
+     -moz-box-shadow: inset @x @y @blur @spread rgba(@rgbR, @rgbG, @rgbB, @alpha);*/
+        box-shadow: inset @x @y @blur @spread rgba(@rgbR, @rgbG, @rgbB, @alpha);
+}
 
 // Basic transform
 .transform( @transform ) {
