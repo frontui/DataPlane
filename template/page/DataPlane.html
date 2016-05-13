@@ -41,15 +41,104 @@
                         <div class="value">0</div>
                     </div>
                 </div>
+                <div class="chart-histogram-box">
+                    <div id="sliderBox">
+                        <dl id="slider_show">
+                            <dd class="chart-histogram" id="capital_histogram1" style="z-index: 3;">
+                                <h2>当日融资渠道项目</h2>
+                                <div class="chart-histogram-main">
+                                    <ul>
+                                        <li id="histogram_li1"><span></span><div class="chart-histogram-bar-box">
+                                                <a class="chart-histogram-bar"></a>
+                                                <a class="chart-histogram-bar-beyond"></a>
+                                                <p></p>
+                                            </div>
+                                        </li>
+                                        <li id="histogram_li2"><span></span><div class="chart-histogram-bar-box">
+                                                <a class="chart-histogram-bar"></a>
+                                                <a class="chart-histogram-bar-beyond"></a>
+                                                <p></p>
+                                            </div>
+                                        </li>
+                                        <li id="histogram_li3"><span></span><div class="chart-histogram-bar-box">
+                                                <a class="chart-histogram-bar"></a>
+                                                <a class="chart-histogram-bar-beyond"></a>
+                                                <p></p>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </dd>
+                            <dd class="chart-histogram" id="capital_histogram2" style="opacity: 0;z-index: 2;">
+                                <h2>当日债券支付渠道项目</h2>
+                                <div class="chart-histogram-main">
+                                    <ul>
+                                        <li id="histogram_li4"><span></span><div class="chart-histogram-bar-box">
+                                                <a class="chart-histogram-bar"></a>
+                                                <a class="chart-histogram-bar-beyond"></a>
+                                                <p></p>
+                                            </div>
+                                        </li>
+                                        <li id="histogram_li5"><span></span><div class="chart-histogram-bar-box">
+                                                <a class="chart-histogram-bar"></a>
+                                                <a class="chart-histogram-bar-beyond"></a>
+                                                <p></p>
+                                            </div>
+                                        </li>
+                                        <li id="histogram_li6"><span></span><div class="chart-histogram-bar-box">
+                                                <a class="chart-histogram-bar"></a>
+                                                <a class="chart-histogram-bar-beyond"></a>
+                                                <p></p>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
                 <div class="chart-map-container" id="main">
-
                 </div>
             </div>
-            <div class="main-container-part1-bottom">
-
+            <div class="main-container-part1-bottom" id="capital_data">
+                <div class="part1-bottom-left">
+                    <ul>
+                        <li><span></span> <b></b> <span>元</span></li>
+                        <li><span></span> <b></b> <span>元</span></li>
+                        <li><span></span> <b></b> <span>元</span></li>
+                    </ul>
+                </div>
+                <div class="part1-bottom-center">
+                    <ul>
+                        <li><span></span> <b></b> <span>元</span></li>
+                        <li><span></span> <b></b> <span>元</span></li>
+                        <li><span></span> <b></b> <span>元</span></li>
+                        <li><span></span> <b></b> <span>元</span></li>
+                    </ul>
+                </div>
+                <div class="part1-bottom-right">
+                    <ul>
+                        <li><span></span> <b></b> <span>元</span></li>
+                        <li><span></span> <b></b> <span>元</span></li>
+                    </ul>
+                </div>
             </div>
         </section>
         <section class="main-container-part2">
+            <div class="main-container-part2-top">
+                <h2>历史交易总额(万元)</h2>
+                <h3>780,500,500</h3>
+            </div>
+            <div class="main-container-part2-middle">
+                <div id="capital_line1"></div>
+                <h4 id="capital_line1_title"></h4>
+                <p>单位：万元</p>
+            </div>
+            <div class="main-container-part2-bottom">
+                <div id="capital_line2"></div>
+                <h4 id="capital_line2_title"></h4>
+                <p>单位：万元</p>
+            </div>
         </section>
     </div>
 
@@ -63,9 +152,15 @@
 
 {# 编写页面内联 javascript 代码 #}
 {% block jsPage %}
+
+
+<script src="/static/js/slider.js"></script>
 <script>
     // 基于准备好的dom，初始化echarts实例
     var myChart = echarts.init(document.getElementById('main'), 'vintage');
+    /*myChart.showLoading();
+    myChart.hideLoading();*/
+    var mapArr = new Array();
 
     // 指定图表的配置项和数据
     var geoCoordMap = {
@@ -184,56 +279,52 @@
         '青岛': [120.4651,36.3373],
         '韶关': [113.7964,24.7028]
     };
+    var GZData1, GZData2, GZData3, GZData4;
+    var mapAjax = function () {
+        $.ajax({//动态数据获取
+            type: "get",
+            async: false, //同步执行
+            url: "http://localhost:8671/map.json",
+            dataType: "json",
+            success: function (result) {
+              var mapDataStr = result.mapData;
+              for(var i = 0; i < mapDataStr.length; i++) {
+                mapArr[i] = mapDataStr[i];
+              }
+            },
+            error: function (errorMsg) {
+              alert("当日融资渠道项目数据请求失败！");
+            }
+        });
+    };
+    mapAjax();
 
-    /*var BJData = [
-        [{name:'北京'}, {name:'上海',value:95}],
-        [{name:'北京'}, {name:'广州',value:90}],
-        [{name:'北京'}, {name:'大连',value:80}],
-        [{name:'北京'}, {name:'南宁',value:70}],
-        [{name:'北京'}, {name:'南昌',value:60}],
-        [{name:'北京'}, {name:'拉萨',value:50}],
-        [{name:'北京'}, {name:'长春',value:40}],
-        [{name:'北京'}, {name:'包头',value:30}],
-        [{name:'北京'}, {name:'重庆',value:20}],
-        [{name:'北京'}, {name:'常州',value:10}]
-    ];*/
 
-    /*var SHData = [
-        [{name:'上海'},{name:'包头',value:95}],
-        [{name:'上海'},{name:'昆明',value:90}],
-        [{name:'上海'},{name:'广州',value:80}],
-        [{name:'上海'},{name:'郑州',value:70}],
-        [{name:'上海'},{name:'长春',value:60}],
-        [{name:'上海'},{name:'重庆',value:50}],
-        [{name:'上海'},{name:'长沙',value:40}],
-        [{name:'上海'},{name:'北京',value:30}],
-        [{name:'上海'},{name:'丹东',value:20}],
-        [{name:'上海'},{name:'大连',value:10}]
-    ];*/
 
-    var GZData = [
+    var GZData1 = [
         [{name:'广州'},{name:'福州',value:95}],
         [{name:'广州'},{name:'太原',value:90}],
         [{name:'广州'},{name:'长春',value:80}],
         [{name:'广州'},{name:'重庆',value:70}],
+    ];
+    var GZData2 = [
         [{name:'广州'},{name:'西安',value:60}],
         [{name:'广州'},{name:'成都',value:50}],
         [{name:'广州'},{name:'北京',value:30}],
         [{name:'广州'},{name:'海口',value:10}],
+    ];
+    var GZData3 = [
         [{name:'广州'},{name:'上海',value:95}],
         [{name:'广州'},{name:'大连',value:80}],
         [{name:'广州'},{name:'包头',value:70}],
         [{name:'广州'},{name:'昆明',value:60}],
+    ];
+    var GZData4 = [
         [{name:'广州'},{name:'拉萨',value:50}],
         [{name:'广州'},{name:'连云港',value:40}],
         [{name:'广州'},{name:'深圳',value:20}],
         [{name:'广州'},{name:'乌鲁木齐',value:50}]
     ];
-
-/*
-    var planePath = 'path://M1705.06,1318.313v-89.254l-319.9-221.799l0.073-208.063c0.521-84.662-26.629-121.796-63.961-121.491c-37.332-0.305-64.482,36.829-63.961,121.491l0.073,208.063l-319.9,221.799v89.254l330.343-157.288l12.238,241.308l-134.449,92.931l0.531,42.034l175.125-42.917l175.125,42.917l0.531-42.034l-134.449-92.931l12.238-241.308L1705.06,1318.313z';
-*/
-
     var convertData = function (data) {
         var res = [];
         for (var i = 0; i < data.length; i++) {
@@ -251,106 +342,128 @@
         return res;
     };
 
-    var color = ['#5dd396','#ffa022', '#46bee9'];
+    /*var dataLen = function (data) {
+        var datacolor = [];
+        for (var i = 0; i < data.length; i++) {
+            color[i];
+            if (color[i] == undefined || color[i] == "") {
+                color[i] = color[0];
+            }
+            datacolor[i] = color[i]
+        }
+        alert(datacolor);
+        return datacolor;
+    };*/
+
+    var color = ['#ff8106','#53c697', '#5d97fe','#e06484'];
     var series = [];
-    [/*['北京', BJData], ['上海', SHData],*/ ['广州', GZData]].forEach(function (item, i) {
+    //mapArr = [['充值', GZData1],['提现', GZData2],['融资通过的申请', GZData3],['信用支付', GZData4]];
+    mapArr.forEach(function (item, i) {
         series.push(
-                {
-                    name: item[0] + ' Top10',
-                    type: 'lines',
-                    zlevel: 1,
-                    effect: {
-                        show: true,
-                        period: 6,
-                        trailLength: 0.7,
-                        color: '#fff',
-                        symbolSize: 4
-                    },
-                    lineStyle: {
-                        normal: {
-                            color: color[i],
-                            width: 0,
-                            curveness: 0.2
-                        }
-                    },
-                    data: convertData(item[1])
+            {//迁移运动线条
+                name: item[0],
+                type: 'lines',
+                zlevel: 3,
+                effect: {
+                    show: true,
+                    period: 4,
+                    trailLength: 0.5,
+                    color: color[i],
+                    shadowBlur : 3,
+                    symbolSize: 5
                 },
-                {
-                    name: item[0] + ' Top10',
-                    type: 'lines',
-                    zlevel: 2,
-                    effect: {
+                lineStyle: {
+                    normal: {
+                        color: color[i],
+                        width: 0,
+                        curveness: 0.2,
+                    }
+                },
+                label: {
+                    show: false
+                },
+                data: convertData(item[1])
+            },
+            /*{//迁移线条
+                name: item[0],
+                type: 'lines',
+                zlevel: 2,
+                effect: {
+                    show: false,
+                    period: 6,//动画时间
+                    trailLength: 0,
+                    symbol: 'pin',
+                    symbolSize: 11
+                },
+                lineStyle: {
+                    normal: {
+                        color: color[i],
+                        //color: dataLen(item[1]),
+                        width: 2,
+                        opacity: 1,
+                        curveness: 0.2
+                    }
+                },
+                data: convertData(item[1])
+            },*/
+            {//城市原点及名称
+                name: item[0],
+                type: 'effectScatter',
+                coordinateSystem: 'geo',
+                zlevel: 2,
+                rippleEffect: {
+                    scale: 3.5,
+                    brushType: 'stroke'//波纹的填充方式
+                },
+                label: {
+                    normal: {
                         show: false,
-                        period: 6,
-                        trailLength: 0,
-                        symbol: 'pin',
-                        symbolSize: 11
-                    },
-                    lineStyle: {
-                        normal: {
-                            color: color[i],
-                            width: 1,
-                            opacity: 0.4,
-                            curveness: 0.2
-                        }
-                    },
-                    data: convertData(item[1])
+                        position: 'right',
+                        formatter: '{b}'
+                    }
                 },
-                {
-                    name: item[0] + ' Top10',
-                    type: 'effectScatter',
-                    coordinateSystem: 'geo',
-                    zlevel: 2,
-                    rippleEffect: {
-                        brushType: 'stroke'
-                    },
-                    label: {
-                        normal: {
-                            show: true,
-                            position: 'right',
-                            formatter: '{b}'
-                        }
-                    },
-                    symbolSize: function (val) {
-                        return val[2] / 8;
-                    },
-                    itemStyle: {
-                        normal: {
-                            color: color[i]
-                        }
-                    },
-                    data: item[1].map(function (dataItem) {
-                        return {
-                            name: dataItem[1].name,
-                            value: geoCoordMap[dataItem[1].name].concat([dataItem[1].value])
-                        };
-                    })
-                });
+                symbolSize: function (val) {
+                    return val[2] / 8;
+                },
+                itemStyle: {
+                    normal: {
+                        color: color[i]
+                    }
+                },
+                data: item[1].map(function (dataItem) {
+                    return {
+                        name: dataItem[1].name,
+                        value: geoCoordMap[dataItem[1].name].concat([dataItem[1].value])
+                    };
+                })
+            });
     });
 
     var option = {
         backgroundColor: 'transparent',
-        title : {
-            text: '业务数据地图',
-            subtext: '数据纯属虚构',
-            left: '50%',
+        /*title : {
+            left: 'center',
             top:'5%',
             textStyle : {
                 color: '#fff',
             }
-        },
+        },*/
         tooltip : {
-            trigger: 'item'
+            trigger: 'item',
         },
         legend: {
             orient: 'vertical',
-            top: 'bottom',
             left: 'right',
-            data:['广州 Top10','北京 Top10', '上海 Top10'],
+            bottom: 50,
+            align: 'left',
+            itemWidth: 10,
+            itemHeight: 10,
+            data:['充值','提现','融资通过的申请','信用支付'],
             textStyle: {
-                color: '#fff'
+                color: '#666',
+                fontSize: 12
             },
-            selectedMode: 'single'
+            selectedMode: 'multiple'
         },
         geo: {
             map: 'china',
@@ -365,14 +478,16 @@
                     show: false
                 }
             },
-            roam: true,
+            roam: false,
             itemStyle: {
                 normal: {
-                    areaColor: '#80a1bb',
+                    areaColor: '#d1dce2',
+                    opacity: 0.6,
                     borderColor: '#527187'
                 },
                 emphasis: {
-                    areaColor: '#89acc8'
+                    areaColor: '#89acc8',
+                    opacity: 0.6,
                 }
             }
         },
@@ -381,5 +496,338 @@
 
     // 使用刚指定的配置项和数据显示图表。
     myChart.setOption(option);
+</script>
+<script>//折线统计图-资产池留存资金
+  var lineChart1 = echarts.init(document.getElementById('capital_line1'));
+  var seriesLineXData = new Array();
+  var seriesLineYData = new Array();
+  var seriesTitle;
+  var doAjax1 = function () {
+      $.ajax({//动态数据获取
+         type: "get",
+         async: false, //同步执行
+         url: "http://localhost:8671/lineChart1.json",
+         dataType: "json",
+         success: function (result) {
+            //console.log("-------454: "+JSON.stringify(result)+"\n");
+            var dataStr = result.lineChart1[0].dataStr;
+            for(var i = 0; i < dataStr.length; i++) {
+                seriesLineXData[i] = dataStr[i].day;
+                seriesLineYData[i] = dataStr[i].capital;
+            }
+            //seriesTitle = result.lineChart1[0].title;
+            document.getElementById("capital_line1_title").innerText = result.lineChart1[0].title;
+         },
+         error: function (errorMsg) {
+            alert("资产池留存资金数据请求失败！");
+         }
+      });
+  };
+  var lineoption1 = {
+    title: {
+        show: false,
+        /*text: seriesTitle,
+        textStyle: {
+            color: '#fff',
+            fontWeight: 'lighter',
+            fontSize: 22
+        },
+        left: '16px',
+        borderColor: '#ff7e00',*/
+        //borderWidth: 3
+    },
+    tooltip : {
+        trigger: 'axis'
+    },
+    legend: {
+        data:['资产池留存资金',]
+    },
+    grid: {
+        left: '16px',
+        right: '16px',
+        bottom: '16px',
+        containLabel: true
+    },
+    xAxis : [
+        {
+            type : 'category',
+            boundaryGap : false,
+            splitLine : {show: false},
+            axisLabel : {show: true,textStyle:{color: '#fff'}},
+            axisLine : {lineStyle:{color: '#86cbf5'}},
+            axisTick : {lineStyle:{color: '#86cbf5'}},
+            //data : ['1','3','5','7','9','11','13','15','17','19','21']
+            data : seriesLineXData
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value',
+            splitLine : {show: true,lineStyle: {color: '#86cbf5',opacity: 0.3}},
+            axisLabel : {show: true,textStyle:{color: '#fff'}},
+            axisLine : {lineStyle:{color: '#86cbf5'}},
+            axisTick : {lineStyle:{color: '#86cbf5'}}
+        }
+    ],
+    series : [
+        {
+            name:'留存资金总额',
+            type:'line',
+            stack: '总量',
+            itemStyle: {normal: {color: '#bbefff'}},
+            lineStyle: {normal: {color: '#86cbf5'}},
+            areaStyle: {normal: {color: '#8ed4ff',opacity: 0.5}},
+            //data:[68000, 75000, 90000, 70000, 75000, 70000, 65000, 75000, 80000, 72000, 65000]
+            data: seriesLineYData
+        }
+    ]
+  };
+  doAjax1();
+  lineChart1.setOption(lineoption1);
+  var timeTicket = setInterval(function () {
+      doAjax1();
+      lineChart1.setOption(lineoption1);
+  }, 1000);
+</script>
+<script>//折线统计图-交易金额
+  var lineChart2 = echarts.init(document.getElementById('capital_line2'));
+  var seriesLineXData1 = new Array();
+  var seriesLineYData1 = new Array();
+  var seriesLineYData2 = new Array();
+  var seriesTitle2;
+  var doAjax2 = function () {
+      $.ajax({//动态数据获取
+         type: "get",
+         async: false, //同步执行
+         url: "http://localhost:8671/lineChart2.json",
+         dataType: "json",
+         success: function (result) {
+            var dataStr2 = result.lineChart2[0].dataStr;
+            for(var i = 0; i < dataStr2.length; i++) {
+                seriesLineXData1[i] = dataStr2[i].day;
+                seriesLineYData1[i] = dataStr2[i].recharge_cap;
+                seriesLineYData2[i] = dataStr2[i].withdraw_cap;
+            }
+            //seriesTitle2 = result.lineChart2[0].title;
+            document.getElementById("capital_line2_title").innerText = result.lineChart2[0].title;
+         },
+         error: function (errorMsg) {
+            alert("交易金额数据请求失败！");
+         }
+      });
+  };
+
+
+  var lineoption2 = {
+    title: {
+        show: false,
+        /*text: seriesTitle2,
+        textStyle: {
+            color: '#fff',
+            fontWeight: 'lighter',
+            fontSize: 22
+        },
+        left: '16px',
+        borderColor: '#ff7e00',*/
+    },
+    tooltip : {
+        trigger: 'axis'
+    },
+    legend: {
+        align: 'left',
+        itemGap: 12,
+        itemWidth: 8,
+        itemHeight: 8,
+        right: '100px',
+        top: '0px',
+        orient: 'horizontal',
+        textStyle: {color: '#fff',fontSize: 10},
+        data: [
+            {name: '充值',icon: 'rect'},
+            {name: '提现',icon: 'rect'}
+        ]
+    },
+    grid: {
+        left: '16px',
+        right: '16px',
+        bottom: '16px',
+        containLabel: true
+    },
+    xAxis : [
+        {
+            type : 'category',
+            boundaryGap : false,
+            nameTextStyle : {color: '#fff'},
+            splitLine : {show: true,lineStyle: {color: '#bee5ff',opacity: 0.3}},
+            axisLabel : {show: true,textStyle:{color: '#fff'}},
+            axisLine : {lineStyle:{color: '#86cbf5',opacity: 0.3}},
+            axisTick : {show:false},
+            //data : ['1','3','5','7','9','11','13','15','17','19','21']
+            data : seriesLineXData1
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value',
+            splitLine : {show: true,lineStyle: {color: '#bee5ff',opacity: 0.3}},
+            axisLine : {lineStyle:{color: '#86cbf5',opacity: 0.3}},
+            axisTick : {show:false},
+            axisLabel : {show: true,textStyle:{color: '#fff'}},
+        }
+    ],
+    series : [
+        {
+            name:'充值',
+            type:'line',
+            itemStyle: {normal: {color: '#4ac492'}},
+            lineStyle: {normal: {color: '#4ac492'}},
+            areaStyle: {normal: {color: '#4ac492',opacity: 0.5}},
+            //data:[90000, 88000, 85000, 75000, 78000, 68000, 64000, 62000, 58000, 59000, 52000]
+            data: seriesLineYData1 
+        },
+        {
+            name:'提现',
+            type:'line',
+            itemStyle: {normal: {color: '#53abec'}},
+            lineStyle: {normal: {color: '#53abec'}},
+            areaStyle: {normal: {color: '#53abec',opacity: 0.5}},
+            //data:[50000, 58000, 62000, 68000, 75000, 70000, 66000, 70000, 80000, 95000, 96000]
+            data: seriesLineYData2
+        }
+    ]
+  };
+  doAjax2();
+  lineChart2.setOption(lineoption2);
+  var timeTicket = setInterval(function () {
+      doAjax2();
+      lineChart2.setOption(lineoption2);
+  }, 1000);
+</script>
+<script>//柱状图-当日融资渠道项目(自定义)
+
+  var maxPeakVal = 0;
+  function id(x) {
+      if (typeof x == "string") return document.getElementById(x);
+      return x;
+  }
+  function histogramFn(peak_val, cur_val, li_id, li_name) {
+      //console.log("-------724--maxPeakVal: "+maxPeakVal+" peak_val: "+peak_val+" cur_val: "+cur_val);
+
+      var liId = id(li_id);
+      var barBox = liId.getElementsByTagName('div')[0], liSp = liId.getElementsByTagName('span')[0];
+      var bar = barBox.getElementsByTagName('a')[0], barBy = barBox.getElementsByTagName('a')[1], barP = barBox.getElementsByTagName('p')[0];
+
+      var barBoxW = barBox.offsetWidth;
+      var str_cur = parseFloat(cur_val).toLocaleString();
+
+      if (maxPeakVal < peak_val && peak_val > cur_val) {maxPeakVal = peak_val;}
+      else if(maxPeakVal < peak_val && peak_val < cur_val) {maxPeakVal = cur_val;}
+      if (str_cur == undefined) {
+        liSp.innerText = " ";
+      } else{
+        liSp.innerText = li_name;
+      }
+      if (str_cur == 0 || str_cur == "" || str_cur == undefined) {
+        barP.innerText = 0;
+      } else{
+        barP.innerText = str_cur;
+      }
+
+      if(peak_val > cur_val) {//比较 峰值/当前值
+        console.log("----738:  "+peak_val+" / "+cur_val+"\n\n");
+
+        bar.style.width = cur_val/maxPeakVal * barBoxW + "px";
+        barBy.style.left = cur_val/maxPeakVal * barBoxW + "px";
+        barBy.style.width = 0;
+        bar.title = cur_val + "元";
+        barBy.title = cur_val-peak_val + "元";
+      } else if (peak_val < cur_val) {
+        console.log("----743:  "+peak_val+" / "+cur_val+"\n\n");
+
+        if (cur_val > maxPeakVal) {maxPeakVal = cur_val;}
+        bar.style.width = peak_val/maxPeakVal * barBoxW + "px";
+        barBy.style.left = peak_val/maxPeakVal * barBoxW + "px";
+        barBy.style.width = (maxPeakVal-peak_val)/maxPeakVal * barBoxW + "px";
+        bar.title = peak_val + "元";
+        barBy.title = maxPeakVal-peak_val + "元";
+      } else {
+        console.log("----751:  "+peak_val+" / "+cur_val+"\n\n");
+
+        bar.style.width = peak_val/maxPeakVal * barBoxW + "px";
+        barBy.style.left = peak_val/maxPeakVal * barBoxW + "px";
+        barBy.style.width = (cur_val-peak_val)/maxPeakVal * barBoxW + "px";
+        bar.title = peak_val + "元";
+        barBy.title = cur_val-peak_val + "元";
+      }
+
+      return maxPeakVal;
+  }
+
+  var doAjax3 = function () {
+      $.ajax({//动态数据获取
+         type: "get",
+         async: false, //同步执行
+         url: "http://localhost:8671/histogram.json",
+         dataType: "json",
+         success: function (result) {
+            var dataStr3 = result.histogram[0].dataStr;
+            for(var i = 0, j = 1; i < dataStr3.length; i++,j++) {
+                //histogramFn(dataStr3[0].peak_val, dataStr3[i].cur_val, "histogram_li"+j ,dataStr3[i].name);
+                histogramFn(12000, dataStr3[i].cur_val, "histogram_li"+j ,dataStr3[i].name);
+            }
+
+            var dataStr4 = result.histogram[1].dataStr;
+            for(var i = 0, j = 4; i < dataStr4.length; i++,j++) {
+                //histogramFn(dataStr4[0].peak_val, dataStr4[i].cur_val, "histogram_li"+j ,dataStr4[i].name);
+                histogramFn(10100, dataStr4[i].cur_val, "histogram_li"+j ,dataStr4[i].name);
+            }
+         },
+         error: function (errorMsg) {
+            alert("当日融资渠道项目数据请求失败！");
+         }
+      });
+  };
+  doAjax3();
+  var timeTicket = setInterval(function () {
+      //doAjax3();
+  }, 1000);
+</script>
+<script>//页面底部-具体数据
+  function capitalDataFn(div_id, name, capital_val, i) {
+      var divId = id(div_id);
+      var tag_li = divId.getElementsByTagName('li')[i];
+      var tag_sp1 = tag_li.getElementsByTagName('span')[0];
+      var tag_b = tag_li.getElementsByTagName('b')[0];
+
+      var capital_str = parseFloat(capital_val).toLocaleString();
+      if (capital_str == undefined) {
+        tag_b.innerText = " ";
+      } else{
+        tag_b.innerText = capital_str;
+      }
+
+      tag_sp1.innerText = name;
+  }
+  var doAjax4 = function () {
+      $.ajax({//动态数据获取
+         type: "get",
+         async: false, //同步执行
+         url: "http://localhost:8671/capital_data.json",
+         dataType: "json",
+         success: function (result) {
+            var dataStr4 = result.capital_data;
+            for(var i = 0; i < dataStr4.length; i++) {
+                capitalDataFn(capital_data, dataStr4[i].name, dataStr4[i].capital_val, i);
+            }
+         },
+         error: function (errorMsg) {
+            alert("当日融资渠道项目数据请求失败！");
+         }
+      });
+  };
+  doAjax4();
+  var timeTicket = setInterval(function () {
+      doAjax4();
+  }, 1000);
 </script>
 {% endblock %}
