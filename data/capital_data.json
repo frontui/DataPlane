@@ -1,0 +1,13 @@
+{
+"capital_data":
+	[{"name": "当日投资", "capital_val":"680000" },
+	  {"name": "当日支付", "capital_val":"520000" },
+	  {"name": "当日提现", "capital_val":"73000" },
+	  {"name": "当日融资", "capital_val":"800000" },
+	  {"name": "累计融资", "capital_val":"96000000" },
+	  {"name": "当日还款", "capital_val":"42000" },
+	  {"name": "累计还款", "capital_val":"300000000" },
+	  {"name": "当日信用支付金额", "capital_val":"500000" },
+	  {"name": "累计金额", "capital_val":"64000000" }
+	]
+}

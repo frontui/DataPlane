@@ -284,7 +284,7 @@
         $.ajax({//动态数据获取
             type: "get",
             async: false, //同步执行
-            url: "http://localhost:8671/map.json",
+            url: "/data/map.json",
             dataType: "json",
             success: function (result) {
               var mapDataStr = result.mapData;
@@ -506,7 +506,7 @@
       $.ajax({//动态数据获取
          type: "get",
          async: false, //同步执行
-         url: "http://localhost:8671/lineChart1.json",
+         url: "/data/lineChart1.json",
          dataType: "json",
          success: function (result) {
             //console.log("-------454: "+JSON.stringify(result)+"\n");
@@ -599,7 +599,7 @@
       $.ajax({//动态数据获取
          type: "get",
          async: false, //同步执行
-         url: "http://localhost:8671/lineChart2.json",
+         url: "/data/lineChart2.json",
          dataType: "json",
          success: function (result) {
             var dataStr2 = result.lineChart2[0].dataStr;
@@ -767,7 +767,7 @@
       $.ajax({//动态数据获取
          type: "get",
          async: false, //同步执行
-         url: "http://localhost:8671/histogram.json",
+         url: "/data/histogram.json",
          dataType: "json",
          success: function (result) {
             var dataStr3 = result.histogram[0].dataStr;
@@ -812,7 +812,7 @@
       $.ajax({//动态数据获取
          type: "get",
          async: false, //同步执行
-         url: "http://localhost:8671/capital_data.json",
+         url: "/data/capital_data.json",
          dataType: "json",
          success: function (result) {
             var dataStr4 = result.capital_data;

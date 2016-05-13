@@ -26,5 +26,5 @@ task(serverRoot);
 /*-------------
 *  svn任务
 -------------*/
-//var svnTask = require('./task/svnTask');
-//svnTask(Lib.banner);
+var svnTask = require('./task/svnTask');
+svnTask(Lib.banner);
