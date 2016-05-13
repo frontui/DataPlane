@@ -5,7 +5,7 @@
 var gulp = require('gulp');
 var config = require('../config.json')
 var pkg    = require('../package.json')
-//var svn    = require('../svn.json')
+var svn    = require('../svn.json')
 var gulp   = require('gulp')
 var path   = require('path')
 var fs     = require('fs')
@@ -14,13 +14,13 @@ var connect = $.connect
 
 var Lib    = require('../lib')
 
-module.exports = function svn(banner) {
+module.exports = function svnTask(banner) {
   // 模板
   gulp.task('svnTemplate', function(){
       return gulp.src(['./'+ config.destPath + '/**/**.html'])
               //.pipe($.changed(svn.path))
-              .pipe($.replace(/\/static/g, './static'))
-              .pipe($.replace(/"(\/)bower_components\/(.*)\/([a-zA-Z0-9.]+\.js)(.*)"/g, '"'+ config.staticPath +'/js/$3$4"'))
+              //.pipe($.replace(/\/static/g, './static'))
+              .pipe($.replace(/"(\/)bower_components\/(.*)\/([a-zA-Z0-9.]+\.js)(.*)"/g, '/static/js/$3$4"'))
               .pipe(gulp.dest(svn.path))
   });
 
@@ -57,6 +57,11 @@ module.exports = function svn(banner) {
               .pipe(gulp.dest(svn.staticPath+'/js'))
   })
 
+  gulp.task('data', function(){
+    return gulp.src(['./data/**/**.json'], {base: 'client'})
+        .pipe(gulp.dest(svn.staticPath))
+  })
+
   // images
   gulp.task('svnImage', function(){
       return gulp.src([config.staticPath+'/images/**/**', '!'+config.staticPath+'/images/sprite/sprite-**/', '!'+config.staticPath+'/images/sprite/sprite-**/**/**'])
@@ -72,7 +77,7 @@ module.exports = function svn(banner) {
           .pipe(gulp.dest(svn.staticPath+'/images'))
   })
 
-  gulp.task('svnServer', ['svnTemplate', 'svnCopy', 'svnCss', 'svnJs', 'svnImage', 'svnBowerJs'], function(){
+  gulp.task('svnServer', ['svnTemplate', 'svnCopy', 'svnCss', 'svnJs', 'svnImage', 'svnBowerJs', 'data'], function(){
       connect.server({
           root: svn.path,
           port: svn.port
