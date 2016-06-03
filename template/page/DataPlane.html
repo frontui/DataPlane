@@ -24,27 +24,18 @@
     {{ navigator.theNav(mainNav,cur='1') }}
 
     {# 内容 #}
+    {% raw %}
     <div class="main-container">
         <section class="main-container-part1">
             <div class="main-container-part1-top">
                 <div class="main-chart-topic">
                     <h1>当日交易总额（元）</h1>
-                    <div class="main-chart-topic-values">
-                        <div class="value">7</div>
-                        <div class="point">,</div>
-                        <div class="value">8</div>
-                        <div class="value">0</div>
-                        <div class="value">5</div>
-                        <div class="point">,</div>
-                        <div class="value">0</div>
-                        <div class="value">0</div>
-                        <div class="value">0</div>
-                    </div>
+                    <div class="main-chart-topic-values" id="todayTotal"></div>
                 </div>
                 <div class="chart-histogram-box">
                     <div id="sliderBox">
-                        <dl id="slider_show">
-                            <dd class="chart-histogram" id="capital_histogram1" style="z-index: 3;">
+                        <dl id="slider_show" style="left: 0px;">
+                            <dd class="chart-histogram" id="capital_histogram1">
                                 <h2>当日融资渠道项目</h2>
                                 <div class="chart-histogram-main">
                                     <ul>
@@ -69,7 +60,7 @@
                                     </ul>
                                 </div>
                             </dd>
-                            <dd class="chart-histogram" id="capital_histogram2" style="opacity: 0;z-index: 2;">
+                            <dd class="chart-histogram" id="capital_histogram2">
                                 <h2>当日债券支付渠道项目</h2>
                                 <div class="chart-histogram-main">
                                     <ul>
@@ -97,29 +88,13 @@
                         </dl>
                     </div>
                 </div>
-                <div class="chart-map-container" id="main">
+                <div class="chart-map-container" id="main" ms-controller="map">
                 </div>
             </div>
-            <div class="main-container-part1-bottom" id="capital_data">
-                <div class="part1-bottom-left">
+            <div class="main-container-part1-bottom" id="capital_data" ms-controller="capital">
+                <div class="part1-bottom-capital">
                     <ul>
-                        <li><span></span> <b></b> <span>元</span></li>
-                        <li><span></span> <b></b> <span>元</span></li>
-                        <li><span></span> <b></b> <span>元</span></li>
-                    </ul>
-                </div>
-                <div class="part1-bottom-center">
-                    <ul>
-                        <li><span></span> <b></b> <span>元</span></li>
-                        <li><span></span> <b></b> <span>元</span></li>
-                        <li><span></span> <b></b> <span>元</span></li>
-                        <li><span></span> <b></b> <span>元</span></li>
-                    </ul>
-                </div>
-                <div class="part1-bottom-right">
-                    <ul>
-                        <li><span></span> <b></b> <span>元</span></li>
-                        <li><span></span> <b></b> <span>元</span></li>
+                        <li ms-repeat="datacapital"><div class="part1-bottom-capital-div"><span>{{el.name}}</span> <b>{{el.capital_val}}</b> <span>元</span></div></li>
                     </ul>
                 </div>
             </div>
@@ -127,7 +102,9 @@
         <section class="main-container-part2">
             <div class="main-container-part2-top">
                 <h2>历史交易总额(万元)</h2>
-                <h3>780,500,500</h3>
+                <div class="numAnim">
+                    <div class="numAnim_cur"><div class="anim_cur" id="historyTotal"><!-- 780500500 --></div></div>
+                </div>
             </div>
             <div class="main-container-part2-middle">
                 <div id="capital_line1"></div>
@@ -141,7 +118,7 @@
             </div>
         </section>
     </div>
-
+    {% endraw %}
 {% endblock %}
 
 
@@ -155,12 +132,15 @@
 
 
 <script src="/static/js/slider.js"></script>
+<script src="/static/js/avalon.modern.js"></script>
+<script src="/static/js/scroller.min.js"></script>
+<!-- <script src="/static/js/avalon1.4.js"></script> -->
 <script>
     // 基于准备好的dom，初始化echarts实例
     var myChart = echarts.init(document.getElementById('main'), 'vintage');
     /*myChart.showLoading();
     myChart.hideLoading();*/
-    var mapArr = new Array();
+    //var mapArr = new Array();
 
     // 指定图表的配置项和数据
     var geoCoordMap = {
@@ -280,51 +260,58 @@
         '韶关': [113.7964,24.7028]
     };
     var GZData1, GZData2, GZData3, GZData4;
-    var mapAjax = function () {
+
+    var vm = avalon.define({
+       $id: "map",
+       datatitle: [],
+       datamap: [],
+       datalen: 0
+    });
+
+    function getArrayItems(tempArr, num) {
+      var data_title;
+      var returnArrStr = new Array();
+      for (var i = 0; i < tempArr.length; i++) {
+        var dataStr = new Array();
+        for (var j = 0; j < num; j++) {
+            var arrIndex = Math.floor(Math.random() * tempArr[i].dataStr.length);
+            data_title = tempArr[i].title;
+            dataStr[j] = tempArr[i].dataStr[arrIndex];
+            tempArr[i].dataStr.splice(arrIndex, 1);
+            if(tempArr[i].dataStr.length < 0) { break; }
+        }
+        returnArrStr[i] = {"title":data_title,"dataStr": dataStr};
+      }
+      result2 = returnArrStr;
+      return result2;
+    }
+
+
+    //var mapAjax = function () {
         $.ajax({//动态数据获取
             type: "get",
             async: false, //同步执行
             url: "/data/map.json",
+            //url: "http://192.168.7.189:81/ajax/map.ashx",
             dataType: "json",
             success: function (result) {
-              var mapDataStr = result.mapData;
-              for(var i = 0; i < mapDataStr.length; i++) {
-                mapArr[i] = mapDataStr[i];
+              getArrayItems(result,3);
+              for(var i = 0; i < result2.length; i++) {
+                for(var j = 0; j < result2[i].dataStr.length; j++) {
+                    result2[i].dataStr[j][1].value = "60";
+                }
+                vm.datatitle[i] = "'"+ result2[i].title +"'";
+                vm.datamap[i] = [result2[i].title,result2[i].dataStr];
+                vm.datalen = vm.datalen + result2[i].dataStr.length;
               }
             },
             error: function (errorMsg) {
-              alert("当日融资渠道项目数据请求失败！");
+              alert("地图数据请求失败！");
             }
         });
-    };
-    mapAjax();
-
-
-
-    var GZData1 = [
-        [{name:'广州'},{name:'福州',value:95}],
-        [{name:'广州'},{name:'太原',value:90}],
-        [{name:'广州'},{name:'长春',value:80}],
-        [{name:'广州'},{name:'重庆',value:70}],
-    ];
-    var GZData2 = [
-        [{name:'广州'},{name:'西安',value:60}],
-        [{name:'广州'},{name:'成都',value:50}],
-        [{name:'广州'},{name:'北京',value:30}],
-        [{name:'广州'},{name:'海口',value:10}],
-    ];
-    var GZData3 = [
-        [{name:'广州'},{name:'上海',value:95}],
-        [{name:'广州'},{name:'大连',value:80}],
-        [{name:'广州'},{name:'包头',value:70}],
-        [{name:'广州'},{name:'昆明',value:60}],
-    ];
-    var GZData4 = [
-        [{name:'广州'},{name:'拉萨',value:50}],
-        [{name:'广州'},{name:'连云港',value:40}],
-        [{name:'广州'},{name:'深圳',value:20}],
-        [{name:'广州'},{name:'乌鲁木齐',value:50}]
-    ];
+    //};
+    //mapAjax();
+    
     var convertData = function (data) {
         var res = [];
         for (var i = 0; i < data.length; i++) {
@@ -358,7 +345,7 @@
     var color = ['#ff8106','#53c697', '#5d97fe','#e06484'];
     var series = [];
     //mapArr = [['充值', GZData1],['提现', GZData2],['融资通过的申请', GZData3],['信用支付', GZData4]];
-    mapArr.forEach(function (item, i) {
+    vm.datamap.forEach(function (item, i) {
         series.push(
             {//迁移运动线条
                 name: item[0],
@@ -384,28 +371,6 @@
                 },
                 data: convertData(item[1])
             },
-            /*{//迁移线条
-                name: item[0],
-                type: 'lines',
-                zlevel: 2,
-                effect: {
-                    show: false,
-                    period: 6,//动画时间
-                    trailLength: 0,
-                    symbol: 'pin',
-                    symbolSize: 11
-                },
-                lineStyle: {
-                    normal: {
-                        color: color[i],
-                        //color: dataLen(item[1]),
-                        width: 2,
-                        opacity: 1,
-                        curveness: 0.2
-                    }
-                },
-                data: convertData(item[1])
-            },*/
             {//城市原点及名称
                 name: item[0],
                 type: 'effectScatter',
@@ -449,7 +414,7 @@
             }
         },*/
         tooltip : {
-            trigger: 'item',
+            trigger: 'item'
         },
         legend: {
             orient: 'vertical',
@@ -459,6 +424,7 @@
             itemWidth: 10,
             itemHeight: 10,
             data:['充值','提现','融资通过的申请','信用支付'],
+            //data: [vm.datatitle],
             textStyle: {
                 color: '#666',
                 fontSize: 12
@@ -587,7 +553,7 @@
   var timeTicket = setInterval(function () {
       doAjax1();
       lineChart1.setOption(lineoption1);
-  }, 1000);
+  }, 5000);
 </script>
 <script>//折线统计图-交易金额
   var lineChart2 = echarts.init(document.getElementById('capital_line2'));
@@ -701,7 +667,7 @@
   var timeTicket = setInterval(function () {
       doAjax2();
       lineChart2.setOption(lineoption2);
-  }, 1000);
+  }, 5000);
 </script>
 <script>//柱状图-当日融资渠道项目(自定义)
 
@@ -734,7 +700,7 @@
       }
 
       if(peak_val > cur_val) {//比较 峰值/当前值
-        console.log("----738:  "+peak_val+" / "+cur_val+"\n\n");
+        //console.log("----738:  "+peak_val+" / "+cur_val+"\n\n");
 
         bar.style.width = cur_val/maxPeakVal * barBoxW + "px";
         barBy.style.left = cur_val/maxPeakVal * barBoxW + "px";
@@ -742,7 +708,7 @@
         bar.title = cur_val + "元";
         barBy.title = cur_val-peak_val + "元";
       } else if (peak_val < cur_val) {
-        console.log("----743:  "+peak_val+" / "+cur_val+"\n\n");
+        //console.log("----743:  "+peak_val+" / "+cur_val+"\n\n");
 
         if (cur_val > maxPeakVal) {maxPeakVal = cur_val;}
         bar.style.width = peak_val/maxPeakVal * barBoxW + "px";
@@ -751,7 +717,7 @@
         bar.title = peak_val + "元";
         barBy.title = maxPeakVal-peak_val + "元";
       } else {
-        console.log("----751:  "+peak_val+" / "+cur_val+"\n\n");
+        //console.log("----751:  "+peak_val+" / "+cur_val+"\n\n");
 
         bar.style.width = peak_val/maxPeakVal * barBoxW + "px";
         barBy.style.left = peak_val/maxPeakVal * barBoxW + "px";
@@ -789,11 +755,11 @@
   };
   doAjax3();
   var timeTicket = setInterval(function () {
-      //doAjax3();
-  }, 1000);
+      doAjax3();
+  }, 5000);
 </script>
 <script>//页面底部-具体数据
-  function capitalDataFn(div_id, name, capital_val, i) {
+  /*function capitalDataFn(div_id, name, capital_val, i) {
       var divId = id(div_id);
       var tag_li = divId.getElementsByTagName('li')[i];
       var tag_sp1 = tag_li.getElementsByTagName('span')[0];
@@ -807,7 +773,13 @@
       }
 
       tag_sp1.innerText = name;
-  }
+  }*/
+
+  var cVm = avalon.define({
+    $id: "capital",
+    datacapital: []
+  });
+
   var doAjax4 = function () {
       $.ajax({//动态数据获取
          type: "get",
@@ -815,9 +787,12 @@
          url: "/data/capital_data.json",
          dataType: "json",
          success: function (result) {
-            var dataStr4 = result.capital_data;
-            for(var i = 0; i < dataStr4.length; i++) {
-                capitalDataFn(capital_data, dataStr4[i].name, dataStr4[i].capital_val, i);
+            //var dataStr4 = result.capital_data;
+            cVm.datacapital = result.capital_data;
+            for(var i = 0; i < cVm.datacapital.length; i++) {
+                //capitalDataFn(capital_data, cVm.datacapital[i].name, cVm.datacapital[i].capital_val, i);
+                cVm.datacapital[i].capital_val = parseFloat(cVm.datacapital[i].capital_val).toLocaleString();
+                //cVm.datacapital[i].capital_val;
             }
          },
          error: function (errorMsg) {
@@ -827,7 +802,39 @@
   };
   doAjax4();
   var timeTicket = setInterval(function () {
-      doAjax4();
-  }, 1000);
+      //doAjax4();
+  }, 5000);
+
+  avalon.scan();
+</script>
+
+<script type="text/javascript">
+var historyScroller=Scroller.getNewInstance({
+    width: 250,
+    amount:80,
+    interval:700,
+    separatorType:Scroller.SEPARATOR.THOUSAND,
+    separator:","
+});
+historyScroller.appendTo(document.getElementById("historyTotal"));
+historyScroller.start("000000");
+
+
+var todayScroller=Scroller.getNewInstance({
+    amount:80,
+    interval:700,
+    separatorType:Scroller.SEPARATOR.THOUSAND,
+    separator:","
+});
+todayScroller.appendTo(document.getElementById("todayTotal"));
+todayScroller.setStyle({
+    margin: "0"
+});
+todayScroller.start("000000");
+
+setInterval(function(){
+    historyScroller.scrollTo("100000");
+    todayScroller.scrollTo("7805000");
+},1000);
 </script>
 {% endblock %}
