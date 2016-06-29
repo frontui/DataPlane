@@ -1,13 +1,1 @@
-{
-"histogram":
-	[{"title": "当日融资渠道项目",
-	  "dataStr":[{ "peak_val":"12000" , "cur_val":"14000" , "name": "众付宝" },
-			  { "peak_val":"10000" , "cur_val":"9000" , "name": "日日金" },
-			  { "peak_val":"9000" , "cur_val":"5100" , "name": "姨吗金" }]
-	},
-	{"title": "当日债券支付渠道项",
-	  "dataStr":[{ "peak_val":"10100" , "cur_val":"10100" , "name": "众付宝" },
-			  { "peak_val":"9000" , "cur_val":"8000" , "name": "日日金" },
-			  { "peak_val":"7000" , "cur_val":"9000" , "name": "姨吗金" }]
-	}]
-}
+[{"title":"当日债券支付渠道项","dataStr":[{"peak_val":"410000.00","cur_val":"330001.00","name":"钱端"},{"peak_val":"1511000.00","cur_val":"30201.00","name":"钱途测试"},{"peak_val":"700000.00","cur_val":"20000.00","name":"活期宝"}]},{"title":"当日融资渠道项目","dataStr":[{"peak_val":"1000000","cur_val":"900000.000","name":"保费"},{"peak_val":"100000","cur_val":"700000.000","name":"保费融资"},{"peak_val":"0","cur_val":"230000.000","name":"收融易"}]}]
