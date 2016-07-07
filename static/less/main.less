@@ -603,11 +603,29 @@ body:after {
   margin: 0 auto;
 }
 #sliderBox dl#slider_show {
+  width: 200%;
   margin: 0;
   padding: 0;
-  width: 672px;
   height: 176px;
-  position: absolute;
+  -webkit-animation: slide 10s ease-out infinite;
+  /* -webkit-animation-name: slide; */
+}
+@-webkit-keyframes slide {
+  0% {
+    margin-left: 0;
+  }
+  40% {
+    margin-left: 0;
+  }
+  50% {
+    margin-left: -336px;
+  }
+  90% {
+    margin-left: -336px;
+  }
+  100% {
+    margin-left: 0;
+  }
 }
 
 //scroller
@@ -727,3 +745,4 @@ body:after {
 }
 [ms-controller]{visibility: hidden;}
 /* [ms-controller="capital"]{display:none} */
+

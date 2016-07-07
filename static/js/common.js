@@ -140,7 +140,7 @@ var errorAjax = function (url,status, errorMsg) {
     $.ajax({
 	    type: "get",
 	    async: false,
-	    url: "/ajax/error.ashx",
+	    url: "/data/error.ashx",
 	    data: { "time": formatDate(new Date()), "model": url, "para": status, "message": errorMsg },
 	    dataType: "json",
 	    success: function (result) {
@@ -181,6 +181,14 @@ var seriesNull = [{ "name": "", "type": "lines", "zlevel": 3 }];
 var dataStrNull = [];
 var datamapNull = [["充值", [[{ "name": "beyond" }, { "name": "beyond" }, { "value": "0" }, { "time": "" }]]], ["提现", [[{ "name": "beyond" }, { "name": "beyond" }, { "value": "0" }, { "time": "" }]]], ["融资通过的申请", [[{ "name": "beyond" }, { "name": "beyond" }, { "value": "0" }, { "time": "" }]]], ["信用支付", [[{ "name": "beyond" }, { "name": "beyond" }, { "value": "0" }, { "time": "" }]]]];
 var color = ['#ff8106', '#53c697', '#5d97fe', '#e06484'];
+var lineResult1 = [],lineResult2 = [];
+var seriesLineXData = new Array();
+var seriesLineYData = new Array();
+var seriesLineXData1 = new Array();
+var seriesLineYData1 = new Array();
+var seriesLineYData2 = new Array();
+var lineChart1;
+var lineChart2;
 
 function unique(arr) {//过滤器
     var result = [], hash = {};
@@ -243,8 +251,7 @@ function unique(arr) {//过滤器
 function getArrayItems(tempArr) {
     vm.datamap = datamapNull;
     dataIncrease = 0;
-    curDate = Date.parse(new Date()) / 1000;//当前时间，秒
-
+    var curDate2 = Date.parse(new Date()) / 1000;//当前时间，秒
     if (tempArr != "" && tempArr != undefined) {
         for (var i = 0; i < tempArr.length; i++) {
             //var Str = []];
@@ -256,14 +263,12 @@ function getArrayItems(tempArr) {
                         var dataDateMS = Date.parse(dataDate) / 1000;
                     }
 
-                    if (dataDateMS == (curDate - 900)) {
+                    if (dataDateMS > (curDate2 - 900) && dataDateMS < (curDate2 - 897)) {
                         vm.datamap[i] = [tempArr[i].title, tempArr[i].dataStr];
                         if (tempArr[i].dataStr[j][2].value != "" && tempArr[i].dataStr[j][2].value != undefined) {
                             dataIncrease = parseInt(dataIncrease) + parseInt(tempArr[i].dataStr[j][2].value);
                         }
-                    } else {
-                        vm.datamap[i] = datamapNull[i];
-                    }
+                    } else {vm.datamap[i] = datamapNull[i];}
                 }
             } else {
                 vm.datamap[i] = datamapNull[i];
@@ -282,15 +287,11 @@ function formatDate(now) {
     return year + "/" + month + "/" + date + " " + hour + ":" + minute + ":" + second;
 }
 var mapAjax = function () {
-
-
-
-    var d = new Date(curDate);
     $.ajax({//动态数据获取
         type: "get",
         async: false, //同步执行
-        url: "/ajax/map.ashx",
-        data: { "date": formatDate(new Date(d)), "interval": 30 },
+        url: "/data/map1.json",
+        data: { "date": formatDate(new Date(curDate)), "interval": 30 },
         dataType: "json",
         success: function (result) {
             dataResult = [];
@@ -303,13 +304,13 @@ var mapAjax = function () {
         error: function (errorMsg) {
             myChart.hideLoading();
             //var Msg = "地图数据请求失败！";
-            errorAjax(this.url, errorMsg.status, errorMsg.statusText);
+            //errorAjax(this.url, errorMsg.status, errorMsg.statusText);
         }
     });
-    $.ajax({
+    /*$.ajax({
         type: "get",
         async: false, //同步执行
-        url: "/ajax/mapCity.ashx",
+        url: "/data/mapCity.ashx",
         dataType: "json",
         success: function (result) {
             for (var i = 0; i < result.length; i++) {
@@ -320,13 +321,13 @@ var mapAjax = function () {
         },
         error: function (errorMsg) {
             //console.log("当日发送点地图数据请求失败！");
-            errorAjax(this.url, errorMsg.status, errorMsg.statusText);
+            //errorAjax(this.url, errorMsg.status, errorMsg.statusText);
         }
-    });
+    });*/
 };
-//mapAjax();
+mapAjax();
 var timeTicket = setInterval(function () {
-    //mapAjax();
+    mapAjax();
 }, 900000);
 
 
@@ -349,11 +350,7 @@ var convertData = function (data) {
 
 var mapEach = function () {
     series = [];
-
-
     getArrayItems(dataResult);
-
-
 
     vm.datamap.forEach(function (item, i) {
         series.push({//迁移运动线条
@@ -362,7 +359,7 @@ var mapEach = function () {
             zlevel: 3,
             effect: {
                 show: true,
-                period: 0.8,
+                period: 2.7,
                 trailLength: 0.5,
                 color: color[i],
                 shadowBlur: 3,
@@ -491,7 +488,7 @@ var mapTicket = function () {
     }
     myChart.setOption(option);
 }
-setTimeout(setInterval(mapTicket, 1000), 3000);
+setTimeout(setInterval(mapTicket, 3000), 3000);
 
 var option = {
     backgroundColor: 'transparent',
@@ -561,9 +558,9 @@ function id(x) {
     return x;
 }
 function histogramFn(peak_val, cur_val, li_id, li_name) {
-    peak_val = parseInt(peak_val);
-    cur_val = parseInt(cur_val);
-    console.log("-------724--maxPeakVal: "+maxPeakVal+" peak_val: "+peak_val+" cur_val: "+cur_val);
+    peak_val = parseInt(peak_val);if (isNaN(peak_val)) {peak_val=0;}
+    cur_val = parseInt(cur_val);if (isNaN(cur_val)) {cur_val=0;}
+    //console.log("-------724--maxPeakVal: "+maxPeakVal+" peak_val: "+peak_val+" cur_val: "+cur_val);
 
     var liId = id(li_id);
     var barBox = liId.getElementsByTagName('div')[0], liSp = liId.getElementsByTagName('span')[0];
@@ -657,21 +654,37 @@ var doAjax3 = function () {
             dataStr3 = sortByKey(dataStr3, 'cur_val');
             dataStr4 = sortByKey(dataStr4, 'cur_val');
 
-            for (var i = 0, j = 1; i < dataStr3.length; i++, j++) {
-                histogramFn(peakValAll1, dataStr3[i].cur_val, "histogram_li" + j, dataStr3[i].name);
-            }
-            if (dataStr3.length < 1) { $("#histogram_li1").height(0); }
-            if (dataStr3.length < 2) { $("#histogram_li2").height(0); }
-            if (dataStr3.length < 3) { $("#histogram_li3").height(0); }
+            if (dataStr3.length != 0 && dataStr3[0].cur_val != 0){
+                $("#capital_histogram2").hide();
+                for (var i = 0, j = 1; i < dataStr3.length; i++, j++) {
+                    histogramFn(peakValAll1, dataStr3[i].cur_val, "histogram_li" + j, dataStr3[i].name);
+                }
+                if (dataStr3.length < 1 || dataStr3[0].cur_val == 0) { $("#histogram_li1").height(0); }
+                if (dataStr3.length < 2 || dataStr3[1].cur_val == 0) { $("#histogram_li2").height(0); }
+                if (dataStr3.length < 3 || dataStr3[2].cur_val == 0) { $("#histogram_li3").height(0); }
+                $("#slider_show").css("-webkit-animation-name","slide");
 
-            maxPeakVal = 0;
-            for (var i = 0, j = 4; i < dataStr4.length; i++, j++) {
-                //histogramFn(peakValAll2, dataStr4[i].cur_val, "histogram_li" + j, dataStr4[i].name);
+                maxPeakVal = 0;
             }
-            if (dataStr4.length < 1) { $("#histogram_li4").height(0); }
-            if (dataStr4.length < 2) { $("#histogram_li5").height(0); }
-            if (dataStr4.length < 3) { $("#histogram_li6").height(0); }
-            maxPeakVal = 0;
+            else if (dataStr3[0].cur_val == 0 || dataStr3.length < 1) {
+                $("#capital_histogram2").hide();
+                $("#slider_show").css("-webkit-animation-name","a");
+            }
+            if (dataStr4.length != 0 && dataStr4[0].cur_val != 0){
+                $("#capital_histogram2").show();
+                for (var i = 0, j = 4; i < dataStr4.length; i++, j++) {
+                    histogramFn(peakValAll2, dataStr4[i].cur_val, "histogram_li" + j, dataStr4[i].name);
+                }
+                if (dataStr4.length < 1 || dataStr4[0].cur_val == 0) { $("#histogram_li4").height(0); }
+                if (dataStr4.length < 2 || dataStr4[0].cur_val == 0) { $("#histogram_li5").height(0); }
+                if (dataStr4.length < 3 || dataStr4[0].cur_val == 0) { $("#histogram_li6").height(0); }
+                $("#slider_show").css("-webkit-animation-name","slide");
+                maxPeakVal = 0;
+            }
+            else if (dataStr4[0].cur_val == 0 || dataStr4.length < 1) {
+                $("#capital_histogram2").hide();
+                $("#slider_show").css("-webkit-animation-name","a");
+            }
         },
         error: function (errorMsg) {
             console.log("当日融资渠道项目数据请求失败！");
@@ -680,8 +693,9 @@ var doAjax3 = function () {
 };
 doAjax3();
 var timeTicket = setInterval(function () {
-    //doAjax3();
-}, 5000);
+    doAjax3();
+    //$("#sliderBox").slider()
+}, 900000);
 
 //页面底部-具体数据
 /*function capitalDataFn(div_id, name, capital_val, i) {
@@ -705,351 +719,328 @@ var cVm = avalon.define({
     datacapital: [],
     capitalVal: []
 });
+var capital0Scroller = Scroller.getNewInstance({
+    width: 80,
+    amount: 80,
+    interval: 700,
+    separatorType: Scroller.SEPARATOR.THOUSAND,
+    separator: ","
+});
+var capital1Scroller = Scroller.getNewInstance({
+    width: 80,
+    amount: 80,
+    interval: 700,
+    separatorType: Scroller.SEPARATOR.THOUSAND,
+    separator: ","
+});
+var capital2Scroller = Scroller.getNewInstance({
+    width: 80,
+    amount: 80,
+    interval: 700,
+    separatorType: Scroller.SEPARATOR.THOUSAND,
+    separator: ","
+});
+var capital3Scroller = Scroller.getNewInstance({
+    width: 80,
+    amount: 80,
+    interval: 700,
+    separatorType: Scroller.SEPARATOR.THOUSAND,
+    separator: ","
+});
+var capital4Scroller = Scroller.getNewInstance({
+    width: 80,
+    amount: 80,
+    interval: 700,
+    separatorType: Scroller.SEPARATOR.THOUSAND,
+    separator: ","
+});
+var capital5Scroller = Scroller.getNewInstance({
+    width: 80,
+    amount: 80,
+    interval: 700,
+    separatorType: Scroller.SEPARATOR.THOUSAND,
+    separator: ","
+});
+var capital6Scroller = Scroller.getNewInstance({
+    width: 80,
+    amount: 80,
+    interval: 700,
+    separatorType: Scroller.SEPARATOR.THOUSAND,
+    separator: ","
+});
+var capital7Scroller = Scroller.getNewInstance({
+    width: 80,
+    amount: 80,
+    interval: 700,
+    separatorType: Scroller.SEPARATOR.THOUSAND,
+    separator: ","
+});
+var capital8Scroller = Scroller.getNewInstance({
+    width: 80,
+    amount: 80,
+    interval: 700,
+    separatorType: Scroller.SEPARATOR.THOUSAND,
+    separator: ","
+});
+capital0Scroller.appendTo($("#capital_data li:eq('0') > div")[0]);
+capital1Scroller.appendTo($("#capital_data li:eq('1') > div")[0]);
+capital2Scroller.appendTo($("#capital_data li:eq('2') > div")[0]);
+capital3Scroller.appendTo($("#capital_data li:eq('3') > div")[0]);
+capital4Scroller.appendTo($("#capital_data li:eq('4') > div")[0]);
+capital5Scroller.appendTo($("#capital_data li:eq('5') > div")[0]);
+capital6Scroller.appendTo($("#capital_data li:eq('6') > div")[0]);
+capital7Scroller.appendTo($("#capital_data li:eq('7') > div")[0]);
+capital8Scroller.appendTo($("#capital_data li:eq('8') > div")[0]);
 
+var todayScroller = Scroller.getNewInstance({
+    amount: 80,
+    interval: 700,
+    separatorType: Scroller.SEPARATOR.THOUSAND,
+    separator: ","
+});
+todayScroller.appendTo(document.getElementById("todayTotal"));
+todayScroller.setStyle({
+    margin: "0"
+});
+var historyScroller = Scroller.getNewInstance({
+    width: 250,
+    amount: 80,
+    interval: 700,
+    separatorType: Scroller.SEPARATOR.THOUSAND,
+    separator: ","
+});
+historyScroller.appendTo(document.getElementById("historyTotal"));
 var runScroller = function () {
-    var capital0Scroller = Scroller.getNewInstance({
-        width: 80,
-        amount: 80,
-        interval: 700,
-        separatorType: Scroller.SEPARATOR.THOUSAND,
-        separator: ","
-    });
-    var capital1Scroller = Scroller.getNewInstance({
-        width: 80,
-        amount: 80,
-        interval: 700,
-        separatorType: Scroller.SEPARATOR.THOUSAND,
-        separator: ","
-    });
-    var capital2Scroller = Scroller.getNewInstance({
-        width: 80,
-        amount: 80,
-        interval: 700,
-        separatorType: Scroller.SEPARATOR.THOUSAND,
-        separator: ","
-    });
-    var capital3Scroller = Scroller.getNewInstance({
-        width: 80,
-        amount: 80,
-        interval: 700,
-        separatorType: Scroller.SEPARATOR.THOUSAND,
-        separator: ","
-    });
-    var capital4Scroller = Scroller.getNewInstance({
-        width: 80,
-        amount: 80,
-        interval: 700,
-        separatorType: Scroller.SEPARATOR.THOUSAND,
-        separator: ","
-    });
-    var capital5Scroller = Scroller.getNewInstance({
-        width: 80,
-        amount: 80,
-        interval: 700,
-        separatorType: Scroller.SEPARATOR.THOUSAND,
-        separator: ","
-    });
-    var capital6Scroller = Scroller.getNewInstance({
-        width: 80,
-        amount: 80,
-        interval: 700,
-        separatorType: Scroller.SEPARATOR.THOUSAND,
-        separator: ","
-    });
-    var capital7Scroller = Scroller.getNewInstance({
-        width: 80,
-        amount: 80,
-        interval: 700,
-        separatorType: Scroller.SEPARATOR.THOUSAND,
-        separator: ","
-    });
-    var capital8Scroller = Scroller.getNewInstance({
-        width: 80,
-        amount: 80,
-        interval: 700,
-        separatorType: Scroller.SEPARATOR.THOUSAND,
-        separator: ","
-    });
-    capital0Scroller.appendTo($("#capital_data li:eq('0') > div")[0]);
-    capital1Scroller.appendTo($("#capital_data li:eq('1') > div")[0]);
-    capital2Scroller.appendTo($("#capital_data li:eq('2') > div")[0]);
-    capital3Scroller.appendTo($("#capital_data li:eq('3') > div")[0]);
-    capital4Scroller.appendTo($("#capital_data li:eq('4') > div")[0]);
-    capital5Scroller.appendTo($("#capital_data li:eq('5') > div")[0]);
-    capital6Scroller.appendTo($("#capital_data li:eq('6') > div")[0]);
-    capital7Scroller.appendTo($("#capital_data li:eq('7') > div")[0]);
-    capital8Scroller.appendTo($("#capital_data li:eq('8') > div")[0]);
-
-    var todayScroller = Scroller.getNewInstance({
-        amount: 80,
-        interval: 700,
-        separatorType: Scroller.SEPARATOR.THOUSAND,
-        separator: ","
-    });
-    todayScroller.appendTo(document.getElementById("todayTotal"));
-    todayScroller.setStyle({
-        margin: "0"
-    });
-    var historyScroller = Scroller.getNewInstance({
-        width: 250,
-        amount: 80,
-        interval: 700,
-        separatorType: Scroller.SEPARATOR.THOUSAND,
-        separator: ","
-    });
-    historyScroller.appendTo(document.getElementById("historyTotal"));
-	var cVmVal = [];
+    var cVmVal = [];
     for (var i = 0; i < 9;i++) {
-    	cVmVal[i] = parseFloat(cVm.capitalVal[i] / 10000);
-    	if (cVmVal[i] > 1) {cVmVal[i] = Math.round(cVmVal[i]);}
-    	else if(cVmVal[i]==0){cVmVal[i] = 0;} 
-    	else {cVmVal[i] = 1;}
+        cVmVal[i] = parseFloat(cVm.capitalVal[i] / 10000);
+        if (cVmVal[i] > 1) {cVmVal[i] = Math.round(cVmVal[i]);}
+        else if(cVmVal[i]==0){cVmVal[i] = 0;} 
+        else {cVmVal[i] = 1;}
     }
-    var cVmVal9 = parseFloat(cVm.capitalVal[9]) + parseFloat(dataIncrease);
-    if (cVmVal9 > 1) {cVmVal9 = Math.round(cVmVal9);} else if(cVmVal9==0){cVmVal9 = 0;} else {cVmVal9 = 1;}
-    var cVmVal10 = parseFloat(cVm.capitalVal[10] / 10000) + parseFloat(dataIncrease / 10000);
-    if (cVmVal10 > 1) {cVmVal10 = Math.round(cVmVal10);} else if(cVmVal10==0){cVmVal10 = 0;} else {cVmVal10 = 1;}
 
-    todayScroller.scrollTo(cVmVal9);
-    historyScroller.scrollTo(cVmVal10);
-    capital0Scroller.scrollTo(cVmVal[1]);
-    capital1Scroller.scrollTo(cVmVal[2]);
-    capital2Scroller.scrollTo(cVmVal[3]);
-    capital3Scroller.scrollTo(cVmVal[4]);
-    capital4Scroller.scrollTo(cVmVal[5]);
-    capital5Scroller.scrollTo(cVmVal[6]);
-    capital6Scroller.scrollTo(cVmVal[7]);
-    capital7Scroller.scrollTo(cVmVal[8]);
-    setInterval(function () {
-        todayScroller.scrollTo(cVmVal9);
-        historyScroller.scrollTo(cVmVal10);
-        capital0Scroller.scrollTo(cVmVal[0]);
-        capital1Scroller.scrollTo(cVmVal[1]);
-        capital2Scroller.scrollTo(cVmVal[2]);
-        capital3Scroller.scrollTo(cVmVal[3]);
-        capital4Scroller.scrollTo(cVmVal[4]);
-        capital5Scroller.scrollTo(cVmVal[5]);
-        capital6Scroller.scrollTo(cVmVal[6]);
-        capital7Scroller.scrollTo(cVmVal[7]);
-        capital8Scroller.scrollTo(cVmVal[8]);
-    }, 1000);
+    capital0Scroller.scrollTo(cVmVal[0]);
+    capital1Scroller.scrollTo(cVmVal[1]);
+    capital2Scroller.scrollTo(cVmVal[2]);
+    capital3Scroller.scrollTo(cVmVal[3]);
+    capital4Scroller.scrollTo(cVmVal[4]);
+    capital5Scroller.scrollTo(cVmVal[5]);
+    capital6Scroller.scrollTo(cVmVal[6]);
+    capital7Scroller.scrollTo(cVmVal[7]);
+    capital8Scroller.scrollTo(cVmVal[8]);
 };
-
+var runScroller2 = function () {
+    var tVmVal = [];
+    var tVmVal0 = parseFloat(tVm.capitalVal[0]) + parseFloat(dataIncrease);
+    if (tVmVal0 > 1) {tVmVal0 = Math.round(tVmVal0);} else if(tVmVal0==0){tVmVal0 = 0;} else {tVmVal0 = 1;}
+    var tVmVal1 = parseFloat(tVm.capitalVal[1] / 1000) + parseFloat(dataIncrease / 1000);
+    if (tVmVal1 > 1) {tVmVal1 = Math.round(tVmVal1);} else if(tVmVal1==0){tVmVal1 = 0;} else {tVmVal1 = 1;}
+    
+    todayScroller.scrollTo(tVmVal0);
+    historyScroller.scrollTo(tVmVal1);
+};
+var lineoption1 = {
+    title: {
+        show: false,
+        /*text: seriesTitle,
+        textStyle: {
+            color: '#fff',
+            fontWeight: 'lighter',
+            fontSize: 22
+        },
+        left: '16px',
+        borderColor: '#ff7e00',*/
+        //borderWidth: 3
+    },
+    tooltip: {
+        trigger: 'axis'
+    },
+    legend: {
+        data: ['资产池留存资金', ]
+    },
+    grid: {
+        left: '16px',
+        right: '34px',
+        bottom: '16px',
+        containLabel: true
+    },
+    xAxis: [
+        {
+            type: 'category',
+            boundaryGap: false,
+            splitLine: { show: false },
+            axisLabel: { show: true, textStyle: { color: '#fff' } },
+            axisLine: { lineStyle: { color: '#86cbf5' } },
+            axisTick: { lineStyle: { color: '#86cbf5' } },
+            //data : ['1','3','5','7','9','11','13','15','17','19','21']
+            data: seriesLineXData
+        }
+    ],
+    yAxis: [
+        {
+            type: 'value',
+            splitLine: { show: true, lineStyle: { color: '#86cbf5', opacity: 0.3 } },
+            axisLabel: { show: true, textStyle: { color: '#fff' } },
+            axisLine: { lineStyle: { color: '#86cbf5' } },
+            axisTick: { lineStyle: { color: '#86cbf5' } }
+        }
+    ],
+    series: [
+        {
+            name: '留存资金总额',
+            type: 'line',
+            stack: '总量',
+            itemStyle: { normal: { color: '#bbefff' } },
+            lineStyle: { normal: { color: '#86cbf5' } },
+            areaStyle: { normal: { color: '#8ed4ff', opacity: 0.5 } },
+            //data:[68000, 75000, 90000, 70000, 75000, 70000, 65000, 75000, 80000, 72000, 65000]
+            data: seriesLineYData
+        }
+    ]
+};
+var lineoption2 = {
+    title: {
+        show: false,
+        /*text: "text",
+        textStyle: {
+            color: '#fff',
+            fontWeight: 'lighter',
+            fontSize: 22
+        },
+        left: '16px',
+        borderColor: '#ff7e00',*/
+    },
+    tooltip: {
+        trigger: 'axis'
+    },
+    legend: {
+        align: 'left',
+        itemGap: 12,
+        itemWidth: 8,
+        itemHeight: 8,
+        right: '100px',
+        top: '0px',
+        orient: 'horizontal',
+        textStyle: { color: '#fff', fontSize: 10 },
+        data: [
+            { name: '充值', icon: 'rect' },
+            { name: '提现', icon: 'rect' }
+        ]
+    },
+    grid: {
+        left: '16px',
+        right: '34px',
+        bottom: '16px',
+        containLabel: true
+    },
+    xAxis: [
+        {
+            type: 'category',
+            boundaryGap: false,
+            nameTextStyle: { color: '#fff' },
+            splitLine: { show: true, lineStyle: { color: '#bee5ff', opacity: 0.3 } },
+            axisLabel: { show: true, textStyle: { color: '#fff' } },
+            axisLine: { lineStyle: { color: '#86cbf5', opacity: 0.3 } },
+            axisTick: { show: false },
+            //data : ['1','3','5','7','9','11','13','15','17','19','21']
+            data: seriesLineXData1
+        }
+    ],
+    yAxis: [
+        {
+            type: 'value',
+            splitLine: { show: true, lineStyle: { color: '#bee5ff', opacity: 0.3 } },
+            axisLine: { lineStyle: { color: '#86cbf5', opacity: 0.3 } },
+            axisTick: { show: false },
+            axisLabel: { show: true, textStyle: { color: '#fff' } },
+        }
+    ],
+    series: [
+        {
+            name: '充值',
+            type: 'line',
+            itemStyle: { normal: { color: '#4ac492' } },
+            lineStyle: { normal: { color: '#4ac492' } },
+            areaStyle: { normal: { color: '#4ac492', opacity: 0.5 } },
+            //data:[90000, 88000, 85000, 75000, 78000, 68000, 64000, 62000, 58000, 59000, 52000]
+            data: seriesLineYData1
+        },
+        {
+            name: '提现',
+            type: 'line',
+            itemStyle: { normal: { color: '#53abec' } },
+            lineStyle: { normal: { color: '#53abec' } },
+            areaStyle: { normal: { color: '#53abec', opacity: 0.5 } },
+            //data:[50000, 58000, 62000, 68000, 75000, 70000, 66000, 70000, 80000, 95000, 96000]
+            data: seriesLineYData2
+        }
+    ]
+};
 var runLineChart = function () {
     //折线统计图-资产池留存资金
-    var lineChart1 = echarts.init(document.getElementById('capital_line1'));
-    var seriesLineXData = new Array();
-    var seriesLineYData = new Array();
-    var seriesTitle;
     var doAjax1 = function () {
         $.ajax({//动态数据获取
             type: "get",
             async: false, //同步执行
-            url: "/ajax/lineChart1.ashx",
+            url: "/data/lineChart1.json",
             dataType: "json",
             success: function (result) {
-                var dataStr = result.dataStr;
-                for (var i = 0; i < dataStr.length; i++) {
-                    seriesLineXData[i] = dataStr[i].day;
-                    seriesLineYData[i] = dataStr[i].capital / 10000;
+                if (lineResult1 != JSON.stringify(result.dataStr)) {
+                    lineResult1 = JSON.stringify(result.dataStr);
+                    lineChart1 = echarts.init(document.getElementById('capital_line1'));
+                    var dataStr = result.dataStr;
+                    for (var i = 0; i < dataStr.length; i++) {
+                        seriesLineXData[i] = dataStr[i].day;
+                        seriesLineYData[i] = dataStr[i].capital / 10000;
+                    }
+                    //seriesTitle = result.lineChart1[0].title;
+                    document.getElementById("capital_line1_title").innerText = result.title;
+                    lineChart1.setOption(lineoption1);
                 }
-                //seriesTitle = result.lineChart1[0].title;
-                document.getElementById("capital_line1_title").innerText = result.title;
-                lineChart1.setOption(lineoption1);
             },
             error: function (errorMsg) {
                 //console.log("资产池留存资金数据请求失败！");
-                errorAjax(this.url, errorMsg.status, errorMsg.statusText);
+                //errorAjax(this.url, errorMsg.status, errorMsg.statusText);
             }
         });
     };
-    var lineoption1 = {
-        title: {
-            show: false,
-            /*text: seriesTitle,
-            textStyle: {
-                color: '#fff',
-                fontWeight: 'lighter',
-                fontSize: 22
-            },
-            left: '16px',
-            borderColor: '#ff7e00',*/
-            //borderWidth: 3
-        },
-        tooltip: {
-            trigger: 'axis'
-        },
-        legend: {
-            data: ['资产池留存资金', ]
-        },
-        grid: {
-            left: '16px',
-            right: '34px',
-            bottom: '16px',
-            containLabel: true
-        },
-        xAxis: [
-            {
-                type: 'category',
-                boundaryGap: false,
-                splitLine: { show: false },
-                axisLabel: { show: true, textStyle: { color: '#fff' } },
-                axisLine: { lineStyle: { color: '#86cbf5' } },
-                axisTick: { lineStyle: { color: '#86cbf5' } },
-                //data : ['1','3','5','7','9','11','13','15','17','19','21']
-                data: seriesLineXData
-            }
-        ],
-        yAxis: [
-            {
-                type: 'value',
-                splitLine: { show: true, lineStyle: { color: '#86cbf5', opacity: 0.3 } },
-                axisLabel: { show: true, textStyle: { color: '#fff' } },
-                axisLine: { lineStyle: { color: '#86cbf5' } },
-                axisTick: { lineStyle: { color: '#86cbf5' } }
-            }
-        ],
-        series: [
-            {
-                name: '留存资金总额',
-                type: 'line',
-                stack: '总量',
-                itemStyle: { normal: { color: '#bbefff' } },
-                lineStyle: { normal: { color: '#86cbf5' } },
-                areaStyle: { normal: { color: '#8ed4ff', opacity: 0.5 } },
-                //data:[68000, 75000, 90000, 70000, 75000, 70000, 65000, 75000, 80000, 72000, 65000]
-                data: seriesLineYData
-            }
-        ]
-    };
-    //doAjax1();
-    var timeTicket = setInterval(function () {
-        //doAjax1();
-        lineChart1.setOption(lineoption1);
-    }, 900000);
+    doAjax1();
 
     //折线统计图-交易金额
-    var lineChart2 = echarts.init(document.getElementById('capital_line2'));
-    var seriesLineXData1 = new Array();
-    var seriesLineYData1 = new Array();
-    var seriesLineYData2 = new Array();
-    var seriesTitle2;
     var doAjax2 = function () {
         $.ajax({//动态数据获取
             type: "get",
             async: false, //同步执行
-            url: "/ajax/lineChart2.ashx",
+            url: "/data/lineChart2.json",
             dataType: "json",
             success: function (result) {
-                var dataStr2 = result.dataStr;
-                for (var i = 0; i < dataStr2.length; i++) {
-                    seriesLineXData1[i] = dataStr2[i].day;
-                    seriesLineYData1[i] = dataStr2[i].recharge_cap / 10000;
-                    seriesLineYData2[i] = dataStr2[i].withdraw_cap / 10000;
+                if (lineResult2 != JSON.stringify(result.dataStr)) {
+                    lineResult2 = JSON.stringify(result.dataStr);
+                    lineChart2 = echarts.init(document.getElementById('capital_line2'));
+                    var dataStr2 = result.dataStr;
+                    for (var i = 0; i < dataStr2.length; i++) {
+                        seriesLineXData1[i] = dataStr2[i].day;
+                        seriesLineYData1[i] = dataStr2[i].recharge_cap / 10000;
+                        seriesLineYData2[i] = dataStr2[i].withdraw_cap / 10000;
+                    }
+                    document.getElementById("capital_line2_title").innerText = result.title;
+                    lineChart2.setOption(lineoption2);
                 }
-                //seriesTitle2 = result.lineChart2[0].title;
-                document.getElementById("capital_line2_title").innerText = result.title;
-                lineChart2.setOption(lineoption2);
             },
             error: function (errorMsg) {
                 //console.log("交易金额数据请求失败！");
-                errorAjax(this.url, errorMsg.status, errorMsg.statusText);
+                //errorAjax(this.url, errorMsg.status, errorMsg.statusText);
             }
         });
     };
-
-
-    var lineoption2 = {
-        title: {
-            show: false,
-            /*text: seriesTitle2,
-            textStyle: {
-                color: '#fff',
-                fontWeight: 'lighter',
-                fontSize: 22
-            },
-            left: '16px',
-            borderColor: '#ff7e00',*/
-        },
-        tooltip: {
-            trigger: 'axis'
-        },
-        legend: {
-            align: 'left',
-            itemGap: 12,
-            itemWidth: 8,
-            itemHeight: 8,
-            right: '100px',
-            top: '0px',
-            orient: 'horizontal',
-            textStyle: { color: '#fff', fontSize: 10 },
-            data: [
-                { name: '充值', icon: 'rect' },
-                { name: '提现', icon: 'rect' }
-            ]
-        },
-        grid: {
-            left: '16px',
-            right: '34px',
-            bottom: '16px',
-            containLabel: true
-        },
-        xAxis: [
-            {
-                type: 'category',
-                boundaryGap: false,
-                nameTextStyle: { color: '#fff' },
-                splitLine: { show: true, lineStyle: { color: '#bee5ff', opacity: 0.3 } },
-                axisLabel: { show: true, textStyle: { color: '#fff' } },
-                axisLine: { lineStyle: { color: '#86cbf5', opacity: 0.3 } },
-                axisTick: { show: false },
-                //data : ['1','3','5','7','9','11','13','15','17','19','21']
-                data: seriesLineXData1
-            }
-        ],
-        yAxis: [
-            {
-                type: 'value',
-                splitLine: { show: true, lineStyle: { color: '#bee5ff', opacity: 0.3 } },
-                axisLine: { lineStyle: { color: '#86cbf5', opacity: 0.3 } },
-                axisTick: { show: false },
-                axisLabel: { show: true, textStyle: { color: '#fff' } },
-            }
-        ],
-        series: [
-            {
-                name: '充值',
-                type: 'line',
-                itemStyle: { normal: { color: '#4ac492' } },
-                lineStyle: { normal: { color: '#4ac492' } },
-                areaStyle: { normal: { color: '#4ac492', opacity: 0.5 } },
-                //data:[90000, 88000, 85000, 75000, 78000, 68000, 64000, 62000, 58000, 59000, 52000]
-                data: seriesLineYData1
-            },
-            {
-                name: '提现',
-                type: 'line',
-                itemStyle: { normal: { color: '#53abec' } },
-                lineStyle: { normal: { color: '#53abec' } },
-                areaStyle: { normal: { color: '#53abec', opacity: 0.5 } },
-                //data:[50000, 58000, 62000, 68000, 75000, 70000, 66000, 70000, 80000, 95000, 96000]
-                data: seriesLineYData2
-            }
-        ]
-    };
-    //doAjax2();
-    var timeTicket = setInterval(function () {
-        //doAjax2();
-        lineChart2.setOption(lineoption2);
-    }, 900000);
+    doAjax2();
 }
-
 
 var doAjax4 = function () {
     $.ajax({//动态数据获取
         type: "get",
         async: false, //同步执行
-        url: "/ajax/capital_data.ashx",
+        url: "/data/capital_data.json",
         dataType: "json",
         success: function (result) {
             //var dataStr4 = result.capital_data;
@@ -1061,22 +1052,48 @@ var doAjax4 = function () {
                     $("#capital_data li").eq(i).children("span:eq(1)").text("万元");
                 }
             }
-            if (totleNum) {
                 runScroller();
                 runLineChart();
-                totleNum = false;
-            }
         },
         error: function (errorMsg) {
             //console.log("当日融资渠道项目数据请求失败！");
-            errorAjax(this.url, errorMsg.status, errorMsg.statusText);
+            //errorAjax(this.url, errorMsg.status, errorMsg.statusText);
         }
     });
 };
-//doAjax4();
+doAjax4();
 var timeTicket = setInterval(function () {
-    //doAjax4();
+    doAjax4();
 }, 5000);
+
+
+var tVm = avalon.define({
+    $id: "todayTotal",
+    capitalVal: []
+});
+var doAjax5 = function () {
+    $.ajax({//动态数据获取
+        type: "get",
+        async: false, //同步执行
+        //url: "/ajax/totalamount.ashx",
+        url: "/data/totalamount.json",
+        data: { "date": formatDate(new Date(curDate)), "interval": 15 },
+        dataType: "json",
+        success: function (result) {
+            for (var i = 0; i < result.capital_data.length; i++) {
+                tVm.capitalVal[i] = result.capital_data[i].capital_val
+            }
+            runScroller2();
+        },
+        error: function (errorMsg) {
+            //errorAjax(this.url, errorMsg.status, errorMsg.statusText);
+        }
+    });
+};
+doAjax5();
+var timeTicket = setInterval(function () {
+    doAjax5();
+}, 900000);
 
 avalon.scan();
 //})(window, undefined);
