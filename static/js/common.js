@@ -171,6 +171,15 @@ var vm = avalon.define({
     datacity: [],
     datalen: 0
 });
+var cVm = avalon.define({
+    $id: "capital",
+    datacapital: [],
+    capitalVal: []
+});
+var tVm = avalon.define({
+    $id: "todayTotal",
+    capitalVal: []
+});
 var dataResult = [];
 var series = [];
 var curDate = Date.parse(new Date());
@@ -249,8 +258,8 @@ function unique(arr) {//过滤器
   }
 }*/
 function getArrayItems(tempArr) {
-    vm.datamap = datamapNull;
-    dataIncrease = 0;
+    vm.datamap = [];
+    //dataIncrease = 0;
     var curDate2 = Date.parse(new Date()) / 1000;//当前时间，秒
     if (tempArr != "" && tempArr != undefined) {
         for (var i = 0; i < tempArr.length; i++) {
@@ -265,10 +274,12 @@ function getArrayItems(tempArr) {
 
                     if (dataDateMS > (curDate2 - 900) && dataDateMS < (curDate2 - 897)) {
                         vm.datamap[i] = [tempArr[i].title, tempArr[i].dataStr];
-                        if (tempArr[i].dataStr[j][2].value != "" && tempArr[i].dataStr[j][2].value != undefined) {
+                        if (tempArr[i].dataStr[j][2].value != "" && tempArr[i].dataStr[j][2].value != undefined && (i==0 ||i==1)) {
                             dataIncrease = parseInt(dataIncrease) + parseInt(tempArr[i].dataStr[j][2].value);
                         }
-                    } else {vm.datamap[i] = datamapNull[i];}
+                    } else {
+                        if(vm.datamap[i] == undefined || vm.datamap[i] == "") {vm.datamap[i] = datamapNull[i];}
+                    }
                 }
             } else {
                 vm.datamap[i] = datamapNull[i];
@@ -287,6 +298,7 @@ function formatDate(now) {
     return year + "/" + month + "/" + date + " " + hour + ":" + minute + ":" + second;
 }
 var mapAjax = function () {
+    curDate = Date.parse(new Date());
     $.ajax({//动态数据获取
         type: "get",
         async: false, //同步执行
@@ -714,11 +726,7 @@ var timeTicket = setInterval(function () {
     tag_sp1.innerText = name;
 }*/
 
-var cVm = avalon.define({
-    $id: "capital",
-    datacapital: [],
-    capitalVal: []
-});
+
 var capital0Scroller = Scroller.getNewInstance({
     width: 80,
     amount: 80,
@@ -829,15 +837,16 @@ var runScroller = function () {
     capital7Scroller.scrollTo(cVmVal[7]);
     capital8Scroller.scrollTo(cVmVal[8]);
 };
+var tVmVal0, tVmVal1;
 var runScroller2 = function () {
     var tVmVal = [];
-    var tVmVal0 = parseFloat(tVm.capitalVal[0]) + parseFloat(dataIncrease);
+    tVmVal0 = parseFloat(tVm.capitalVal[0]) + parseFloat(dataIncrease);
     if (tVmVal0 > 1) {tVmVal0 = Math.round(tVmVal0);} else if(tVmVal0==0){tVmVal0 = 0;} else {tVmVal0 = 1;}
-    var tVmVal1 = parseFloat(tVm.capitalVal[1] / 1000) + parseFloat(dataIncrease / 1000);
+    tVmVal1 = parseFloat(tVm.capitalVal[1] / 1000) + parseFloat(dataIncrease / 1000);
     if (tVmVal1 > 1) {tVmVal1 = Math.round(tVmVal1);} else if(tVmVal1==0){tVmVal1 = 0;} else {tVmVal1 = 1;}
-    
     todayScroller.scrollTo(tVmVal0);
     historyScroller.scrollTo(tVmVal1);
+    console.log("-------dataIncrease: "+dataIncrease);
 };
 var lineoption1 = {
     title: {
@@ -1066,12 +1075,9 @@ var timeTicket = setInterval(function () {
     doAjax4();
 }, 5000);
 
-
-var tVm = avalon.define({
-    $id: "todayTotal",
-    capitalVal: []
-});
-var doAjax5 = function () {
+var doAjax5 = function() {
+    dataIncrease = 0;
+    curDate = Date.parse(new Date());
     $.ajax({//动态数据获取
         type: "get",
         async: false, //同步执行
@@ -1094,6 +1100,10 @@ doAjax5();
 var timeTicket = setInterval(function () {
     doAjax5();
 }, 900000);
+var timeTicket = setInterval(function () {
+    runScroller2();
+    console.log("2-----tVmVal0: "+tVmVal0);
+}, 3000);
 
 avalon.scan();
 //})(window, undefined);
