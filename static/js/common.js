@@ -8,6 +8,45 @@
 
 //~(function(Global, undefined) {
 
+function fullScreen(){
+    if(window.outerHeight==screen.height && window.outerWidth==screen.width){
+        $(".main-container-part2-middle").css("height","394px");
+        $(".main-container-part2-bottom").css("height","324px");
+        $(".main-container-part2 > div").css("margin","35px auto");
+    }else{ 
+        $(".main-container-part2 > div").css("margin","10px auto");
+        $(".main-container-part2-middle").css("height","385px");
+        $(".main-container-part2-bottom").css("height","300px");
+    } 
+};
+fullScreen();
+window.onresize = function (){fullScreen();}
+
+
+// 所有ajax请求的通用前置filter
+var pendingRequests = {};
+$.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
+    
+    // 不重复发送相同请求
+    var key = options.url;
+    if (!pendingRequests[key]) {
+        pendingRequests[key] = jqXHR;
+    } else {
+        // or do other
+        jqXHR.abort();
+    }
+    
+    var complete = options.complete;
+    options.complete = function(jqXHR, textStatus) {
+        // clear from pending requests
+        pendingRequests[key] = null;
+        if ($.isFunction(complete)) {
+            complete.apply(this, arguments);
+        }
+    };
+});
+
+
 // 基于准备好的dom，初始化echarts实例
 var myChart = echarts.init(document.getElementById('main'), 'vintage');
 myChart.showLoading();
@@ -169,6 +208,8 @@ var vm = avalon.define({
     //datatitle: [],
     datamap: [],
     datacity: [],
+    hisData: [],
+    dataIncrease: 0,
     datalen: 0
 });
 var cVm = avalon.define({
@@ -184,7 +225,6 @@ var dataResult = [];
 var series = [];
 var curDate = Date.parse(new Date());
 var dataValue = 20;
-var dataIncrease = 0;
 var totleNum = true;
 var seriesNull = [{ "name": "", "type": "lines", "zlevel": 3 }];
 var dataStrNull = [];
@@ -196,17 +236,17 @@ var seriesLineYData = new Array();
 var seriesLineXData1 = new Array();
 var seriesLineYData1 = new Array();
 var seriesLineYData2 = new Array();
-var lineChart1;
-var lineChart2;
+var lineChart1 = echarts.init(document.getElementById('capital_line1'));
+var lineChart2 = echarts.init(document.getElementById('capital_line2'));
 
 function unique(arr) {//过滤器
     var result = [], hash = {};
     for (var i = 0, elem; (elem = arr[i]) != null; i++) {
-        if (!hash[JSON.stringify(elem[0].name)]/* && !hash[JSON.stringify(elem[1].name)]*//* && !hash[JSON.stringify(elem[3].time)]*/) {
+        if (!hash[JSON.stringify(elem[0].name)] || !hash[JSON.stringify(elem[1].name)] || !hash[JSON.stringify(elem[3].time)]) {
             result.push(elem);
             hash[JSON.stringify(elem[0].name)] = true;
-            //hash[JSON.stringify(elem[1].name)] = true;
-            //hash[JSON.stringify(elem[3].time)] = true;
+            hash[JSON.stringify(elem[1].name)] = true;
+            hash[JSON.stringify(elem[3].time)] = true;
             //console.log("-----arr: "+JSON.stringify(elem));
         }
         result.filter(function (item) {
@@ -259,11 +299,14 @@ function unique(arr) {//过滤器
 }*/
 function getArrayItems(tempArr) {
     vm.datamap = [];
-    //dataIncrease = 0;
+    //vm.dataIncrease = 0;
     var curDate2 = Date.parse(new Date()) / 1000;//当前时间，秒
     if (tempArr != "" && tempArr != undefined) {
+
         for (var i = 0; i < tempArr.length; i++) {
-            //var Str = []];
+            datamapNull = [["充值", [[{ "name": "beyond" }, { "name": "beyond" }, { "value": "0" }, { "time": "" }]]], ["提现", [[{ "name": "beyond" }, { "name": "beyond" }, { "value": "0" }, { "time": "" }]]], ["融资通过的申请", [[{ "name": "beyond" }, { "name": "beyond" }, { "value": "0" }, { "time": "" }]]], ["信用支付", [[{ "name": "beyond" }, { "name": "beyond" }, { "value": "0" }, { "time": "" }]]]];
+
+            var Str = [];
             if (tempArr[i].dataStr != "" && tempArr[i].dataStr != undefined && tempArr[i].dataStr != "undefined") {
                 //dataStrNull = [[{"name":"beyond"},{"name":"beyond"},{"time":""}]];
                 for (var j = 0; j < tempArr[i].dataStr.length; j++) {
@@ -272,17 +315,24 @@ function getArrayItems(tempArr) {
                         var dataDateMS = Date.parse(dataDate) / 1000;
                     }
 
-                    if (dataDateMS > (curDate2 - 900) && dataDateMS < (curDate2 - 897)) {
-                        vm.datamap[i] = [tempArr[i].title, tempArr[i].dataStr];
+                    if (dataDateMS > (curDate2 - 4900) && dataDateMS < (curDate2 -840)) {
+                        Str.push(tempArr[i].dataStr[j]);
+
+                        vm.datamap[i] = [tempArr[i].title, Str];
+                        vm.hisData = vm.datamap;
                         if (tempArr[i].dataStr[j][2].value != "" && tempArr[i].dataStr[j][2].value != undefined && (i==0 ||i==1)) {
-                            dataIncrease = parseInt(dataIncrease) + parseInt(tempArr[i].dataStr[j][2].value);
+                            vm.dataIncrease = parseInt(vm.dataIncrease) + parseInt(tempArr[i].dataStr[j][2].value);
                         }
                     } else {
-                        if(vm.datamap[i] == undefined || vm.datamap[i] == "") {vm.datamap[i] = datamapNull[i];}
+                        if(vm.datamap[i] == undefined || vm.datamap[i] == "") {
+                            if (vm.hisData != "" && vm.hisData[i] != null) {vm.datamap[i] = vm.hisData[i];}
+                            else {vm.datamap[i] = datamapNull[i];}
+                        }
                     }
                 }
             } else {
-                vm.datamap[i] = datamapNull[i];
+                if (vm.hisData != "" && vm.hisData[i] != null) {vm.datamap[i] = vm.hisData[i];}
+                else {vm.datamap[i] = datamapNull[i];}
             }
         }
     }
@@ -319,10 +369,10 @@ var mapAjax = function () {
             //errorAjax(this.url, errorMsg.status, errorMsg.statusText);
         }
     });
-    /*$.ajax({
+    $.ajax({
         type: "get",
         async: false, //同步执行
-        url: "/data/mapCity.ashx",
+        url: "/data/mapCity.json",
         dataType: "json",
         success: function (result) {
             for (var i = 0; i < result.length; i++) {
@@ -335,12 +385,13 @@ var mapAjax = function () {
             //console.log("当日发送点地图数据请求失败！");
             //errorAjax(this.url, errorMsg.status, errorMsg.statusText);
         }
-    });*/
+    });
 };
 mapAjax();
 var timeTicket = setInterval(function () {
+    vm.datamap = [];
     mapAjax();
-}, 900000);
+}, 9000);
 
 
 var convertData = function (data) {
@@ -371,7 +422,7 @@ var mapEach = function () {
             zlevel: 3,
             effect: {
                 show: true,
-                period: 2.7,
+                period: 3,
                 trailLength: 0.5,
                 color: color[i],
                 shadowBlur: 3,
@@ -492,6 +543,7 @@ var mapEach = function () {
 };
 mapEach();
 var mapTicket = function () {
+    vm.dataIncrease = 0;
     myChart.clear();
     mapEach();
     option.series = series;
@@ -500,7 +552,7 @@ var mapTicket = function () {
     }
     myChart.setOption(option);
 }
-setTimeout(setInterval(mapTicket, 3000), 3000);
+setTimeout(setInterval(mapTicket, 60000), 3000);
 
 var option = {
     backgroundColor: 'transparent',
@@ -837,16 +889,16 @@ var runScroller = function () {
     capital7Scroller.scrollTo(cVmVal[7]);
     capital8Scroller.scrollTo(cVmVal[8]);
 };
-var tVmVal0, tVmVal1;
+var tVmVal0, tVmVal1, the_Val = 0;
 var runScroller2 = function () {
     var tVmVal = [];
-    tVmVal0 = parseFloat(tVm.capitalVal[0]) + parseFloat(dataIncrease);
+    the_Val = the_Val + Math.floor(Math.random() * vm.dataIncrease / 30);
+    tVmVal0 = parseFloat(tVm.capitalVal[0]) + parseFloat(the_Val);
     if (tVmVal0 > 1) {tVmVal0 = Math.round(tVmVal0);} else if(tVmVal0==0){tVmVal0 = 0;} else {tVmVal0 = 1;}
-    tVmVal1 = parseFloat(tVm.capitalVal[1] / 1000) + parseFloat(dataIncrease / 1000);
+    tVmVal1 = parseFloat(tVm.capitalVal[1] / 10000) + parseFloat(the_Val / 10000);
     if (tVmVal1 > 1) {tVmVal1 = Math.round(tVmVal1);} else if(tVmVal1==0){tVmVal1 = 0;} else {tVmVal1 = 1;}
     todayScroller.scrollTo(tVmVal0);
     historyScroller.scrollTo(tVmVal1);
-    console.log("-------dataIncrease: "+dataIncrease);
 };
 var lineoption1 = {
     title: {
@@ -985,6 +1037,7 @@ var lineoption2 = {
         }
     ]
 };
+
 var runLineChart = function () {
     //折线统计图-资产池留存资金
     var doAjax1 = function () {
@@ -996,15 +1049,14 @@ var runLineChart = function () {
             success: function (result) {
                 if (lineResult1 != JSON.stringify(result.dataStr)) {
                     lineResult1 = JSON.stringify(result.dataStr);
-                    lineChart1 = echarts.init(document.getElementById('capital_line1'));
                     var dataStr = result.dataStr;
                     for (var i = 0; i < dataStr.length; i++) {
                         seriesLineXData[i] = dataStr[i].day;
-                        seriesLineYData[i] = dataStr[i].capital / 10000;
+                        seriesLineYData[i] = (dataStr[i].capital / 10000).toFixed(2);
                     }
                     //seriesTitle = result.lineChart1[0].title;
                     document.getElementById("capital_line1_title").innerText = result.title;
-                    lineChart1.setOption(lineoption1);
+                    lineChart1.setOption(lineoption1,false,true);
                 }
             },
             error: function (errorMsg) {
@@ -1025,15 +1077,14 @@ var runLineChart = function () {
             success: function (result) {
                 if (lineResult2 != JSON.stringify(result.dataStr)) {
                     lineResult2 = JSON.stringify(result.dataStr);
-                    lineChart2 = echarts.init(document.getElementById('capital_line2'));
                     var dataStr2 = result.dataStr;
                     for (var i = 0; i < dataStr2.length; i++) {
                         seriesLineXData1[i] = dataStr2[i].day;
-                        seriesLineYData1[i] = dataStr2[i].recharge_cap / 10000;
-                        seriesLineYData2[i] = dataStr2[i].withdraw_cap / 10000;
+                        seriesLineYData1[i] = (dataStr2[i].recharge_cap / 10000).toFixed(2);
+                        seriesLineYData2[i] = (dataStr2[i].withdraw_cap / 10000).toFixed(2);
                     }
                     document.getElementById("capital_line2_title").innerText = result.title;
-                    lineChart2.setOption(lineoption2);
+                    lineChart2.setOption(lineoption2,false,true);
                 }
             },
             error: function (errorMsg) {
@@ -1076,7 +1127,6 @@ var timeTicket = setInterval(function () {
 }, 5000);
 
 var doAjax5 = function() {
-    dataIncrease = 0;
     curDate = Date.parse(new Date());
     $.ajax({//动态数据获取
         type: "get",
@@ -1100,10 +1150,10 @@ doAjax5();
 var timeTicket = setInterval(function () {
     doAjax5();
 }, 900000);
+
 var timeTicket = setInterval(function () {
     runScroller2();
-    console.log("2-----tVmVal0: "+tVmVal0);
-}, 3000);
+}, 2000);
 
 avalon.scan();
 //})(window, undefined);
