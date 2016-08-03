@@ -155,5 +155,12 @@
 <script src="/static/js/avalon.modern.js"></script>
 <script src="/static/js/scroller.min.js"></script>
 <script src="/static/js/common.js"></script>
+<script src="/static/js/cookie.js"></script>
+<script>
+    var userName = GetCookie("49BAC005-7D5B-4231-8CEA-16939BEACD67");
+    if(userName == null) {
+        location.href="login.html"
+    }
+</script>
 
 {% endblock %}

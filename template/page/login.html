@@ -1,0 +1,92 @@
+{% extends "_layout/Layout.html" %}
+
+
+{# 填写页面 title #}
+{% block title %}Frontpay Data{% endblock %}
+
+
+{# 页面专有样式表地址 #}
+{% block css %}
+{% endblock %}
+
+
+{# 编写页面内联 css 代码 #}
+{% block stylePage %}
+<style>
+</style>
+{% endblock %}
+
+
+{# 加载页面内容 #}
+{% block content %}
+
+    {# 内容 #}
+    {% raw %}
+    <body class="login-body">
+        <div class="main-body ">
+          <div class="main-body-content">
+            <div class="login-wrap">
+              <div class="login-logo-layer clearfix">
+                <h1>数据展板登录</h1>
+              </div>
+              <form class="login-content-box" id="form-login">
+                <div class="login-title">请登录</div>
+                <div class="login-content">
+                  <div class="login-group">
+                    <label class="icon icon-num"></label> <input type="text" class="form-control" placeholder="请输入账号" id="txtUserName" onblur="GetPwdAndChk()">
+                  </div>
+                  <div class="login-group">
+                    <label class="icon icon-key"></label> <input type="password" class="form-control" placeholder="请输入密码" id="txtPassword">
+                  </div>
+                  <p class="fn-pt-10 clearfix"> <label class="password-check">
+                      <input type="checkbox" name="" id="chkRememberPwd"> 记住密码</label>
+                  </p>
+                  <p class="fn-pt-10 error-FontColor1"></p>
+                  <div class="text-align-center fn-mt-10"> <a href="javascript:void(0)" class="btn login-btn" OnClick="SetPwdAndChk()">登录</a> </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+    </body>
+    {% endraw %}
+{% endblock %}
+
+
+{# 页面专有 javascript 文件地址 #}
+{% block js %}
+{% endblock %}
+
+
+{# 编写页面内联 javascript 代码 #}
+{% block jsPage %}
+<script>
+$(".login-btn").click(function(){
+    var data = new Object();
+    data.OptType = '1001';
+    data.LoginName = $(".icon-num").siblings("input[type=text]").val();//SJZBAdmin
+    data.Password = $(".icon-key").siblings("input[type=password]").val();//1qaz1qaz
+    var dataJson = JSON.stringify(data);
+    $.ajax({
+        type: "get",
+        async: false,
+        url: "http://192.168.9.171:81/ajax/role/login.ashx",
+        data: { "data": dataJson},
+        dataType: "jsonp",
+        success: function (result) {
+            $(".error-FontColor1").show();
+            $(".error-FontColor1").text(result.Message);
+            if(result.Code == 107) {
+                $(".error-FontColor1").text("");
+                location.href="DataPlane.html"
+            }
+        },
+        error: function (errorMsg) {
+            console.log("接口传输错误！");
+        }
+    });
+});
+</script>
+<script src="/static/js/cookie.js"></script>
+
+{% endblock %}
