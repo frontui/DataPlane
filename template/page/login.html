@@ -60,12 +60,32 @@
 
 {# 编写页面内联 javascript 代码 #}
 {% block jsPage %}
+<script src="http://pv.sohu.com/cityjson"></script>  
 <script>
+var IP = returnCitySN["cip"];
+var Address = returnCitySN["cname"];
+var ipdata = new Object();
+ipdata.ClientIP = IP;
+ipdata.ClientAddress = Address;
+var ipdataJson = JSON.stringify(ipdata);
+$.ajax({
+    type: "get",
+    async: false,
+    url: "http://192.168.9.171:81/ajax/role/recordVisitors.ashx",
+    data: {"data": ipdataJson},
+    dataType: "jsonp",
+    success: function (result) {
+    },
+    error: function (errorMsg) {
+    }
+});
 $(".login-btn").click(function(){
     var data = new Object();
     data.OptType = '1001';
-    data.LoginName = $(".icon-num").siblings("input[type=text]").val();//SJZBAdmin
-    data.Password = $(".icon-key").siblings("input[type=password]").val();//1qaz1qaz
+    data.LoginName = $(".icon-num").siblings("input[type=text]").val();
+    data.Password = $(".icon-key").siblings("input[type=password]").val();
+    data.ClientIP = IP;
+    data.ClientAddress = Address;
     var dataJson = JSON.stringify(data);
     $.ajax({
         type: "get",
